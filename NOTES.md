@@ -43,3 +43,17 @@
 - Needs Debit Card
 
 - <https://tunnel.pyjam.as/>
+
+## Templates
+
+- <https://templates.langchain.com/?integration_name=rag-ollama-multi-query>
+- <https://templates.langchain.com/?integration_name=rag-supabase>
+
+## Diagrams
+
+- <https://excalidraw.com/>
+- <https://app.diagrams.net/>
+
+## Figma Design
+
+- <https://www.figma.com/file/zmtJFZEaI0iRLi4HpCuB5b/Mini-project?type=design&node-id=0-1&mode=design&t=TpjuNIQ24fzjpav7-0>
