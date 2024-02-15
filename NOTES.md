@@ -44,6 +44,8 @@
 
 - <https://tunnel.pyjam.as/>
 
+- Self Signed Certificates incase HTTPS is required for uvicorn<https://github.com/FiloSottile/mkcert>
+
 ## Templates
 
 - <https://templates.langchain.com/?integration_name=rag-ollama-multi-query>
@@ -57,3 +59,8 @@
 ## Figma Design
 
 - <https://www.figma.com/file/zmtJFZEaI0iRLi4HpCuB5b/Mini-project?type=design&node-id=0-1&mode=design&t=TpjuNIQ24fzjpav7-0>
+
+## Additional Information
+
+- Ports `4943`, `4945`, `4946`, `4947` and `4948` can be used for a custom service by us.
+- Port `11434` is used by Ollama.
