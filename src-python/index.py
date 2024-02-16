@@ -6,13 +6,17 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 from langserve import add_routes
 from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
 import mistletoe
 from mistletoe.block_token import CodeFence
 import json
 import os
+
+import dotenv
+dotenv.load_dotenv()
 # import mangum
 
-COHERE_KEY = os.environ.get("COHERE_KEY") or "Qg0vm03ztzlhiMlbTxLQD9r4YALmOuXVRG9B4hwO"
+COHERE_KEY = os.environ.get("COHERE_KEY")
 
 rag = CohereRagRetriever(llm=ChatCohere(client = None, async_client= None, cohere_api_key=COHERE_KEY))
 # code_rag = CohereRagRetriever(llm=Cohere(client = None, async_client= None, cohere_api_key=COHERE_KEY))
@@ -68,16 +72,29 @@ code_chain = (
 app = FastAPI(
     title="serve-rag-chain-test",
     description="serve-rag-chain-test",
-    version="0.0.1"
+    version="0.1.0",
+)
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
 )
 
 add_routes(app, chat_chain, path="/chat")
 add_routes(app, code_chain, path="/code")
 
+@app.get("/")
+def read_root():
+    return {"Hello": "World"}
+
+
 # handler = mangum.Mangum(app)
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=4945, ssl_keyfile="localhost+2-key.pem", ssl_certfile="localhost+2.pem")
+    uvicorn.run(app, host="0.0.0.0", port=4945)
 
 
