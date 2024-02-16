@@ -5,12 +5,28 @@
     let data: string = "";
 
     async function test_response() {
-        const res = await fetch('http://localhost:4945')
-        const _data = await res.json()
-        data = JSON.stringify(_data)
+        try {
+            const res = await fetch('http://localhost:4945')
+            const _data = await res.json()
+            data = JSON.stringify(_data) 
+        }
+        catch (e) {
+            alert('local server not running')
+            console.log(e)
+            return;
+        }
+        
     }
     
     async function test_langserve_chat() {
+        try {
+            const res = await fetch('http://localhost:4945')
+        }
+        catch (e) {
+            alert('local server not running')
+            console.log(e)
+            return;
+        }
         const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/chat'})
         const result = await remoteChain.invoke('Hi there!')
         // for await (const chunk of result) {
@@ -20,6 +36,14 @@
     }
 
     async function test_langserve_code() {
+        try {
+            const res = await fetch('http://localhost:4945')
+        }
+        catch (e) {
+            alert('local server not running')
+            console.log(e)
+            return;
+        }
         const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/code'})
         const result = await remoteChain.invoke('Python code for factorial')
         data = JSON.parse(result as string)[0]['code']
