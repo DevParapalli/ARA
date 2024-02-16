@@ -64,3 +64,9 @@
 
 - Ports `4943`, `4945`, `4946`, `4947` and `4948` can be used for a custom service by us.
 - Port `11434` is used by Ollama.
+
+## Cell Design
+
+- quilljs <https://quilljs.com/>
+- codemirror <https://codemirror.net/>
+- <https://github.com/touchifyapp/svelte-codemirror-editor>
