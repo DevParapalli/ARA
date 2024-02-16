@@ -1,6 +1,8 @@
 {
-    "functions": {
-        "src-python/serve_rag_llm_test.py": {
+    "redirects": [
+        {
+            "source": "/llm",
+            "destination": "/src-python/serve_rag_llm_test"
         }
-    }
+    ]
 }
