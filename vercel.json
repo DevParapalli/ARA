@@ -1,7 +1,6 @@
 {
     "functions": {
         "src-python/serve_rag_llm_test.py": {
-            "runtime": "python"
         }
     }
 }
