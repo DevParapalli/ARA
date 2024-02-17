@@ -32,7 +32,7 @@
         // for await (const chunk of result) {
         //     data += chunk
         // }
-        data = result
+        data = result as string
     }
 
     async function test_langserve_code() {
@@ -46,7 +46,7 @@
         }
         const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/code'})
         const result = await remoteChain.invoke('Python code for factorial')
-        data = JSON.parse(result as string)[0]['code']
+        data = JSON.parse(result as string)[0]['code'] as string
         // console.log(JSON.parse(result as string))
     
     }
