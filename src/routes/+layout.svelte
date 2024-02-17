@@ -40,7 +40,7 @@
 
 <span id="auth_header">
     {#if !data.session}
-        <a href="/auth/login">login</a> / <a href="/auth/register">signup</a>
+        <a class="" href="/auth/login">login</a> / <a href="/auth/register">signup</a>
     {:else}
         <a href="/auth/user_profile">User profile</a>
         <form action="/auth/logout?/logout" method="POST" use:enhance={submitLogout}>

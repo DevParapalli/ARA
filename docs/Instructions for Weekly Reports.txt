@@ -1,0 +1,66 @@
+Follow the same format for Weekly report and Approval report.
+Please Follow this format
+1.5 line spacing
+Center Align Title in Proxima Nova of font Size 18 bold face.
+Leave a line of 18 font size after the title.
+Below mentioned 4 lines should be in Proxima Nova left align of font size 14. Everything on the left hand side should be bold. Everything after colon should be normal text.
+Report Period: October 10, 2050 - October 17, 2050
+Project Title: Modern Eco-Friendly Residential Complex
+Guide: Guide assigned (refer to excel sheet)
+Report Prepared By: (Your name and your team members name)
+
+Executive Summary: (14 font bold Proxima Nova.) Text in this should be the same font size with normal size face. Three to four lines.
+Current Week Progress:  (14 font bold Proxima Nova.) Table inside it should be with the following columns. Also columns should be the same as current week progress settings.
+Task Description (Name)
+Scheduled Completion (Date)
+Actual Completion (Date)
+Status (Completed or pending)
+Remarks (Any remarks from projectees)
+
+Should be in Proxima Nova justified alignment of font size 14. Everything on the left hand side should be bold. Everything after colon should be normal text.
+
+Accomplishments
+Bullets point same font to be followed as above
+3 points minimum
+
+Challenges & Mitigation:
+Bullets point same font to be followed as above
+3 points minimum
+
+Planned Activities for Next Week:
+Bullets point same font to be followed as above
+3 points minimum
+
+Financial Summary (table format): 14 font bold Proxima Nova. Table inside it should be with the following columns. Also columns should be the same as current week progress settings.
+Description
+Budgeted Amount
+Amount Spent This Week
+Total Expenditure
+
+Risk Assessment:
+Paragraph for minimum 3 lines
+
+Attachments:
+if any
+
+Conclusions and Recommendations:
+Paragraph for minimum 3 lines
+
+Approval: (Leave appropriate lines for guide signature)
+
+
+
+Aditya R. Barad
+(Project Guide,)
+(Designation,)
+(College name, Address,)
+(City, State, Country)
+(Pin Code)
+
+
+Date: October 17, 2050
+
+Leave a single line of 14 font size after every heading.
+
+Regards,
+Chandrajeet Borkar

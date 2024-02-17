@@ -46,7 +46,7 @@
 
 - Self Signed Certificates incase HTTPS is required for uvicorn<https://github.com/FiloSottile/mkcert>
 
-## Templates
+## Templates for LangChain
 
 - <https://templates.langchain.com/?integration_name=rag-ollama-multi-query>
 - <https://templates.langchain.com/?integration_name=rag-supabase>
@@ -70,7 +70,14 @@
 - quilljs <https://quilljs.com/>
 - codemirror <https://codemirror.net/>
 - <https://github.com/touchifyapp/svelte-codemirror-editor>
+- <https://editorjs.io/>
+- <https://ace.c9.io/>
+- <https://github.com/editor-js/awesome-editorjs>
 
 ## Authentication
 
 - <https://dev.to/kvetoslavnovak/supabase-ssr-auth-48j4>
+
+## Theming and Components
+
+- <https://daisyui.com/components/>
