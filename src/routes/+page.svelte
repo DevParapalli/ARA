@@ -98,7 +98,7 @@
 
 </script>
 
-<div class="flex p-10 flex-col space-y-4">
+<div class="flex p-10 flex-col space-y-4 w-full">
     <div class="mockup-code">
         <pre><code class="whitespace-pre-line">{(data) ? data:'Welcome to ARA-alpha'}</code></pre>
     </div>

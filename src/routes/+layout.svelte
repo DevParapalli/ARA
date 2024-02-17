@@ -35,20 +35,35 @@
     };
 </script>
 
-<a href="/">Home</a>
-<!-- <a href="/subscription">Subscriptions</a> -->
 
-<span id="auth_header">
-    {#if !data.session}
-        <a class="" href="/auth/login">login</a> / <a href="/auth/register">signup</a>
-    {:else}
-        <a href="/auth/user_profile">User profile</a>
-        <form action="/auth/logout?/logout" method="POST" use:enhance={submitLogout}>
-            <button type="submit">Logout</button>
-        </form>
-    {/if}
-</span>
-<slot />
+<div class="drawer lg:drawer-open">
+    <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+    <div class="drawer-content flex flex-col items-center justify-center w-full h-full">
+        <slot />
+      <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden absolute bottom-0 right-0 mr-4 mb-4">MENU</label>
+    
+    </div> 
+    <div class="drawer-side">
+      <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
+      <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
+        <!-- Sidebar content here -->
+        <li><a href="/">Home</a></li>
+        {#if !data.session}
+        <li><a href="/auth/login">login</a></li>
+        <li><a href="/auth/register">Register</a></li>
+        {:else}
+        <li><a href="/auth/user_profile">User Profile</a></li>
+        <li class="text-error">
+            <form action="/auth/logout?/logout" method="POST" use:enhance={submitLogout}>
+                <button type="submit">Logout &gt;</button>
+            </form>
+        </li>
+        
+        {/if}
+      </ul>
+    
+    </div>
+  </div>
 
 <style>
     #auth_header {
