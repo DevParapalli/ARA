@@ -1,4 +1,4 @@
-import { AuthApiError } from "@supabase/supabase-js"
+import { AuthApiError, AuthError } from "@supabase/supabase-js"
 import { fail, redirect } from "@sveltejs/kit"
 
 export const actions = {
@@ -16,9 +16,23 @@ export const actions = {
                     error: "invalidCredentials", invalid: true, message: err.message
                 })
             }
+
+            if (err.status && err.status >= 500) {
+                return fail(500, {
+                    error: "Server error. Please try again later.",
+                })
+            }
+
+            if (err) {
+                return fail(err.status, {
+                    error: err.name, message: err.message, invalid: true
+                })
+            }
+
             return fail(500, {
-                error: "Server error. Please try again later.",
+                error: 'Server Error' 
             })
+            
         }
 
         redirect(303, "/auth/user_profile");
