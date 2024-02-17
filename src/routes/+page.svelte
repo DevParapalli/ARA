@@ -64,12 +64,20 @@
             isloading = false;
             return;
         }
+
+        if (!prompt) {
+            prompt = "Hello!"
+        }
+
         const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/chat'})
         const result = await remoteChain.stream(prompt)
         data = ""
         for await (const chunk of result) {
-            if (typeof chunk === 'string')
+            if (typeof chunk === 'string') {
                 data += chunk
+                // console.log(chunk)
+            }
+                
             else {
                 metadata = chunk as object
             }
@@ -89,6 +97,11 @@
             isloading = false;
             return;
         }
+
+        if (!prompt) {
+            prompt = "Hello World Code"
+        }
+
         const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/code'})
         const result = await remoteChain.invoke(prompt)
         data = JSON.parse(result as string)[0]['code'] as string
@@ -99,9 +112,7 @@
 </script>
 
 <div class="flex p-10 flex-col space-y-4 w-full">
-    <div class="mockup-code">
-        <pre><code class="whitespace-pre-line">{(data) ? data:'Welcome to ARA-alpha'}</code></pre>
-    </div>
+    <div class="mockup-code"><pre><code class="whitespace-pre-line">{(data) ? data:'Welcome to ARA-alpha'}</code></pre></div>
     <div class="flex w-full justify-between"><span class="text-sm {status_flag}">{status}</span><span class="text-sm">{('run_id' in metadata) ? JSON.stringify(metadata): ""}</span></div>
     <div class="px-10 w-full"> 
         <div class="label">
