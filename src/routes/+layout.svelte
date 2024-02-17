@@ -36,7 +36,7 @@
 </script>
 
 <a href="/">Home</a>
-<a href="/subscription">Subscriptions</a>
+<!-- <a href="/subscription">Subscriptions</a> -->
 
 <span id="auth_header">
     {#if !data.session}

@@ -70,3 +70,7 @@
 - quilljs <https://quilljs.com/>
 - codemirror <https://codemirror.net/>
 - <https://github.com/touchifyapp/svelte-codemirror-editor>
+
+## Authentication
+
+- <https://dev.to/kvetoslavnovak/supabase-ssr-auth-48j4>
