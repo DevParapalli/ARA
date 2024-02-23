@@ -20,6 +20,9 @@
 - `codellama` works with code.
 - `mistral` beats others, textual model.
 
+- <https://docs.endpoints.anyscale.com/supported-models/mistralai-Mixtral-8x7B-Instruct-v0.1>
+- <https://fireworks.ai/models>
+
 ### Retrievers
 
 - <https://python.langchain.com/docs/integrations/retrievers/cohere>

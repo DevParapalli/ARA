@@ -63,7 +63,7 @@ code_chain = (
     | code_prompt
     | code_model
     | StrOutputParser()
-    | get_code_from_text
+    # | get_code_from_text
 )
 
 # output = chain.invoke("What is LangChain ?")
@@ -77,7 +77,7 @@ app = FastAPI(
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=["http://localhost", "http://localhost:5173", "http://localhost:4173", "https://ara.parapalli.dev"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
