@@ -1,7 +1,7 @@
 <script>
 	import '../app.pcss';
 	import { enhance } from '$app/forms';
-    import { invalidate, invalidateAll, goto } from '$app/navigation';
+    import { invalidate, invalidateAll, goto, beforeNavigate } from '$app/navigation';
     import { onMount } from 'svelte';
 
     export let data;
@@ -33,18 +33,23 @@
         cancel();
         await goto('/');
     };
+
+    let drawer_open = false;
+
+    beforeNavigate(() => {
+        drawer_open = false;
+        console.log('drawer_open', drawer_open);
+    })
 </script>
 
 
-<div class="drawer lg:drawer-open">
-    <input id="my-drawer-2" type="checkbox" class="drawer-toggle" />
+<div class="drawer lg:drawer-open h-full">
+    <input bind:checked={drawer_open} id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-col items-center justify-center w-full h-full">
         <slot />
-      <label for="my-drawer-2" class="btn btn-primary drawer-button lg:hidden absolute bottom-0 right-0 mr-4 mb-4">MENU</label>
-    
     </div> 
     <div class="drawer-side">
-      <label for="my-drawer-2" aria-label="close sidebar" class="drawer-overlay"></label> 
+      <label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label> 
       <ul class="menu p-4 w-80 min-h-full bg-base-200 text-base-content">
         <!-- Sidebar content here -->
         <li><a href="/">Home</a></li>
@@ -64,6 +69,8 @@
     
     </div>
   </div>
+
+  <label for="sidebar-drawer" class="btn btn-primary drawer-button lg:hidden absolute bottom-0 right-0 mr-4 mb-4">MENU</label>
 
 <style>
     form {

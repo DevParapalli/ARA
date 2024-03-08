@@ -30,7 +30,7 @@
 
         
     <button class="btn btn-primary btn-block" type="submit">Login</button>
-    <a class="mr-auto text-sm" href="/auth/reset_password">Reset password</a>
+    <a class="mr-auto link link-info" href="/auth/reset_password">Reset password</a>
 </form> 
 </div>
 
