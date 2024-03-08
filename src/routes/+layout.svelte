@@ -66,9 +66,6 @@
   </div>
 
 <style>
-    #auth_header {
-        float: right;
-    }
     form {
         display: inline;
     }

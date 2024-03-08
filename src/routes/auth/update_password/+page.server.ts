@@ -1,3 +1,4 @@
+import { dev } from "$app/environment"
 import { AuthApiError, AuthError } from "@supabase/supabase-js"
 import { fail, redirect } from "@sveltejs/kit"
 
@@ -5,10 +6,19 @@ export const actions = {
     update_password: async ({ request, locals }) => {
         const formData = await request.formData()
         const password = formData.get('new_password')
+        const password2 = formData.get('new_password_confirm')
+
+        if (password !== password2) {
+            return fail(400, {
+                error: "invalidCredentials", invalid: true, message: "Passwords do not match"
+            })
+        }
 
         const { data, error: err } = await locals.supabase.auth.updateUser({
             password
         })
+
+        dev && console.log(data, err)
 
         if (err) {
             if (err instanceof AuthApiError && err.status >= 400 && err.status < 500) {
@@ -18,6 +28,7 @@ export const actions = {
             }
 
             if (err.status && err.status >= 500) {
+                console.error(err)
                 return fail(500, {
                     error: "Server error. Please try again later.",
                 })
