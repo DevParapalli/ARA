@@ -99,6 +99,7 @@
 *   <https://milkdown.dev/playground>
 
 *   <https://ssssota.github.io/svelte-exmarkdown/docs/07-code-highlight> `Use this`
+*   <https://beartocode.github.io/carta/examples>
 
 ## Authentication
 
