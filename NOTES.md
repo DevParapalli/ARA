@@ -84,3 +84,8 @@
 ## Theming and Components
 
 - <https://daisyui.com/components/>
+
+## Passthrough
+
+- <https://github.com/langchain-ai/langserve/blob/main/examples/passthrough_dict/server.py>
+- <https://github.com/langchain-ai/langserve/blob/main/examples/passthrough_dict/client.ipynb>

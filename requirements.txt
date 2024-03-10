@@ -11,3 +11,5 @@ cohere
 mistletoe
 mangum
 python-dotenv
+langchain-groq
+wikipedia
