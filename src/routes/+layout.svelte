@@ -46,7 +46,7 @@
 <div class="drawer lg:drawer-open h-full">
     <input bind:checked={drawer_open} id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex flex-col items-center justify-center w-full h-screen">
-        <div class="overflow-y-scroll">
+        <div class="overflow-y-auto w-full">
             <slot />
         </div>
     </div> 
@@ -72,7 +72,7 @@
             </div>
             <div  class="text-sm">{data.session.user.email}</div>
         </a>
-
+        <!-- TODO: Update Links -->
         {/if}
 
       </ul>
