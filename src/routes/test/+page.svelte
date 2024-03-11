@@ -1,10 +1,13 @@
 <script lang="ts">
+	import CartaEditorCell from '$lib/components/CartaEditorCell.svelte';
+import CartaViewerCell from '$lib/components/CartaViewerCell.svelte';
+
 
     import {RemoteRunnable} from '@langchain/core/runnables/remote'
 	import { onMount } from 'svelte';
 
     let response: string = `
-    To create a scrollable div, you can use HTML and CSS to specify the overflow property for the div element. Here's an example of how you can do it:
+To create a scrollable div, you can use HTML and CSS to specify the overflow property for the div element. Here's an example of how you can do it:
 
 HTML:
 \`\`\`
@@ -97,7 +100,7 @@ I hope this helps! Let me know if you have any questions.
         }
     }
 
-    async function test_langserve_chat() {
+    async function test_langserve_rag() {
         isloading = true;
         try {
             const res = await fetch('http://localhost:4945')
@@ -110,10 +113,10 @@ I hope this helps! Let me know if you have any questions.
         }
 
         if (!prompt) {
-            prompt = "Hello!"
+            prompt = "Explain the technology behind Claude 3"
         }
 
-        const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/norag'})
+        const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/rag'})
         const result = await remoteChain.stream({prompt: prompt, context: "Machine Learning"})
         response = ""
         metadata = {}
@@ -135,7 +138,7 @@ I hope this helps! Let me know if you have any questions.
             }
             else {
                 other = chunk
-                console.log(chunk)
+                // console.log(chunk)
             }
         }
         // data = result as string
@@ -143,7 +146,7 @@ I hope this helps! Let me know if you have any questions.
         isloading = false;
     }
 
-    async function test_langserve_code() {
+    async function test_langserve_norag() {
         isloading = true;
         try {
             const res = await fetch('http://localhost:4945')
@@ -156,33 +159,58 @@ I hope this helps! Let me know if you have any questions.
         }
 
         if (!prompt) {
-            prompt = "Hello World Code"
+            prompt = "Explain Mixture of Experts."
         }
 
-        const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/code'})
-        const result = await remoteChain.invoke(prompt)
-        response = JSON.parse(result as string)[0]['code'] as string
+        const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/norag'})
+        const result = await remoteChain.stream({prompt: prompt, context: "Machine Learning"})
+        response = ""
+        metadata = {}
+        sources = []
+        for await (const chunk of result) {
+            if (typeof chunk === 'string') {
+                response += chunk
+                continue;
+            }
+            if ('run_id' in (chunk as object) || 'prompt' in (chunk as object)) {
+                metadata = Object.assign(metadata, chunk)
+            }
+            else if ('sources' in (chunk as object)) {
+                sources = chunk as Array<object>
+            }
+            else if ('response' in (chunk as object)) {
+                response += chunk['response'] as string
+            }
+            else {
+                other = chunk
+                // console.log(chunk)
+            }
+        }
+        // data = result as string
+        console.log(response, metadata, sources)
         // console.log(JSON.parse(result as string))
         isloading = false;
     }
 
 </script>
 
-<div class="flex p-10 flex-col gap-4 w-full">
-    <div class="mockup-code"><pre><code class="whitespace-pre-line">{(response) ? response:'Welcome to ARA-alpha'}</code></pre></div>
-    <div class="flex w-full justify-between"><span class="text-sm {status_flag}">{status}</span><span class="text-sm">{('run_id' in metadata) ? JSON.stringify(metadata): ""}</span></div>
-    <div class="px-10 w-full"> 
+<div class="flex p-10 flex-col items-center gap-4 w-full">
+    <!-- <div class="mockup-code"><pre><code class="whitespace-pre-line">{(response) ? response:'Welcome to ARA-alpha'}</code></pre></div> -->
+    <CartaViewerCell value={response} />
+    <div class="flex w-full max-w-3xl justify-between"><span class="text-sm mr-auto {status_flag}">{status}</span></div>
+    <!-- <div class="px-10 w-full"> 
         <div class="label">
             <label for="prompt" class="label-text">Prompt</label>
         </div>
         <input bind:value={prompt} id="prompt" name="prompt" type="text" class="input input-primary w-full">
-    </div>
+    </div> -->
+    <CartaEditorCell bind:value={prompt} />
     <!-- <p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p> -->
     <button on:click={test_localhost_interval} class="{(status_flag.includes('success')) ? 'invisible':'visible'} btn btn-sm btn-info" >Retry Connection</button>
-    <button disabled={isloading} on:click={test_langserve_chat} class="btn btn-primary">Test</button>
-    <!-- <button disabled={isloading} on:click={test_langserve_code} class="btn btn-secondary">Test LangServe Code</button> -->
+    <button disabled={isloading} on:click={test_langserve_rag} class="btn btn-primary">Test with RAG</button>
+    <button disabled={isloading} on:click={test_langserve_norag} class="btn btn-secondary">Test without RAG</button>
     <div class="flex w-full items-center justify-center"><span id="loader" class="loading loading-infinity w-[5rem] {isloading ? 'visible':'invisible'}"></span></div>
-    
+    <div class="w-full max-w-3xl"><span class="ml-auto text-sm">{('run_id' in metadata) ? JSON.stringify(metadata): ""}</span></div>
 </div>
 <style>
     @keyframes hue-rotate-animate {
