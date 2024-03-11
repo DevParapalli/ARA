@@ -113,7 +113,7 @@ I hope this helps! Let me know if you have any questions.
             prompt = "Hello!"
         }
 
-        const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/rag'})
+        const remoteChain = new RemoteRunnable({url: 'http://localhost:4945/norag'})
         const result = await remoteChain.stream({prompt: prompt, context: "Machine Learning"})
         response = ""
         metadata = {}
@@ -179,8 +179,8 @@ I hope this helps! Let me know if you have any questions.
     </div>
     <!-- <p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p> -->
     <button on:click={test_localhost_interval} class="{(status_flag.includes('success')) ? 'invisible':'visible'} btn btn-sm btn-info" >Retry Connection</button>
-    <button disabled={isloading} on:click={test_langserve_chat} class="btn btn-primary">Test LangServe Chat</button>
-    <button disabled={isloading} on:click={test_langserve_code} class="btn btn-secondary">Test LangServe Code</button>
+    <button disabled={isloading} on:click={test_langserve_chat} class="btn btn-primary">Test</button>
+    <!-- <button disabled={isloading} on:click={test_langserve_code} class="btn btn-secondary">Test LangServe Code</button> -->
     <div class="flex w-full items-center justify-center"><span id="loader" class="loading loading-infinity w-[5rem] {isloading ? 'visible':'invisible'}"></span></div>
     
 </div>
