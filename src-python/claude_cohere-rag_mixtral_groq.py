@@ -15,7 +15,8 @@ from langchain_core.runnables import (
 )
 from langchain_community.chat_models import ChatCohere
 
-from langchain_groq import ChatGroq
+# from langchain_groq import ChatGroq
+from langchain_anthropic import ChatAnthropic
 
 from dotenv import load_dotenv
 from pydantic import BaseModel
@@ -29,18 +30,18 @@ from fastapi.middleware.cors import CORSMiddleware
 
 GROQ_KEY = os.environ.get("GROQ_KEY")
 COHERE_KEY = os.environ.get("COHERE_KEY")
-
+ANTHROPIC_KEY = os.environ.get('ANTHROPIC_KEY')
 
 rag = CohereRagRetriever(llm=ChatCohere(client=None, async_client=None, cohere_api_key=COHERE_KEY))
 chat = ChatGroq(temperature=0.5, model="mixtral-8x7b-32768", groq_api_key=GROQ_KEY)
 # chat = ChatGroq(temperature=0.5, model="gemma-7b-it", groq_api_key=GROQ_KEY)
-
+anthropic = ChatAnthropic(model_name="claude-3-sonnet-20240229", anthropic_api_key=ANTHROPIC_KEY)
 # arxiv_retriever = ArxivRetriever(top_k_results=5).with_config(run_name="arxiv")
 
 wiki_retriver = WikipediaRetriever(top_k_results=3).with_config(run_name="wikipedia")
 
 system_message = """
-You don't deny any request unless absolutely necessary.You are Mixtral 7x8b, a open-weight model from Mistral AI.\
+You don't deny any request unless absolutely necessary.\
 When generating any code, make sure to include the language in the codeblock.\
 You are an expert and are talking to experts, you don't need to shy away from technical details or complicated explanations unless specifically asked to do. \
 Make sure you include any mathematics or technical details if the prompt's topic contains it.\
@@ -78,7 +79,7 @@ def merge(x):
 retrieve_all = merge | RunnableParallel(
     {
         'www': rag, 
-        # 'wikipedia': wiki_retriver
+        'wikipedia': wiki_retriver
     }
 ).with_config(run_name="retrieve_all")
 
@@ -106,7 +107,7 @@ answer_chain = (
     "context": itemgetter("context"),
 }
 | prompt_template
-| chat
+| anthropic
 | StrOutputParser()
 | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")

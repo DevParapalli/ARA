@@ -123,6 +123,7 @@ I hope this helps! Let me know if you have any questions.
         sources = []
         let other;
         for await (const chunk of result) {
+            console.log(typeof chunk, chunk);
             if (typeof chunk === 'string') {
                 response += chunk
                 continue;
@@ -138,7 +139,7 @@ I hope this helps! Let me know if you have any questions.
             }
             else {
                 other = chunk
-                // console.log(chunk)
+                console.log(chunk)
             }
         }
         // data = result as string

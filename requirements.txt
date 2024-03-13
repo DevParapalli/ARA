@@ -13,3 +13,4 @@ mangum
 python-dotenv
 langchain-groq
 wikipedia
+langchain-anthropic
