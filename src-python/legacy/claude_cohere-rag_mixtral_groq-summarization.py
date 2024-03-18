@@ -7,7 +7,8 @@ from langchain_community.retrievers import (
 )
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
+from langchain.chains.summarize import load_summarize_chain
 from typing import TypedDict, List
 from langchain_core.runnables import (
     RunnableParallel, 
@@ -15,7 +16,7 @@ from langchain_core.runnables import (
 )
 from langchain_community.chat_models import ChatCohere
 
-# from langchain_groq import ChatGroq
+from langchain_groq import ChatGroq
 from langchain_anthropic import ChatAnthropic
 
 from dotenv import load_dotenv
@@ -32,13 +33,14 @@ GROQ_KEY = os.environ.get("GROQ_KEY")
 COHERE_KEY = os.environ.get("COHERE_KEY")
 ANTHROPIC_KEY = os.environ.get('ANTHROPIC_KEY')
 
-rag = CohereRagRetriever(llm=ChatCohere(client=None, async_client=None, cohere_api_key=COHERE_KEY))
-chat = ChatGroq(temperature=0.5, model="mixtral-8x7b-32768", groq_api_key=GROQ_KEY)
-# chat = ChatGroq(temperature=0.5, model="gemma-7b-it", groq_api_key=GROQ_KEY)
+rag = CohereRagRetriever(llm=ChatCohere(client=None, async_client=None, cohere_api_key=COHERE_KEY), top_k = 3, top_k_results=3)
+mixtral = ChatGroq(temperature=0.5, model="mixtral-8x7b-32768", groq_api_key=GROQ_KEY)
+gemma = ChatGroq(temperature=0.5, model="gemma-7b-it", groq_api_key=GROQ_KEY)
+llama2 = ChatGroq(temperature=0.5, model="llama2-70b-4096", groq_api_key=GROQ_KEY)
 anthropic = ChatAnthropic(model_name="claude-3-sonnet-20240229", anthropic_api_key=ANTHROPIC_KEY)
 # arxiv_retriever = ArxivRetriever(top_k_results=5).with_config(run_name="arxiv")
 
-wiki_retriver = WikipediaRetriever(top_k_results=3).with_config(run_name="wikipedia")
+wiki_retriver = WikipediaRetriever(top_k_results=2).with_config(run_name="wikipedia")
 
 system_message = """
 You don't deny any request unless absolutely necessary.\
@@ -67,21 +69,47 @@ def fuse_docs(input):
     )
     return list(zip(names, docs)) 
 
-def format_named_docs(named_docs: list[tuple[str, Document]]):
-    return "\n\n".join(
-        f"{source}\n{json.dumps(doc.metadata)}\n\n{doc.page_content}" for source, doc in named_docs
+def fuse_merge_docs(input):
+    results_map = input["sources"]
+    names, docs = zip(
+        *((name, doc) for name, docs in results_map.items() for doc in docs)
     )
+    return list(docs)
+
+def format_named_docs(named_docs: list[tuple[str, Document]]):
+    # print(named_docs[0][1].metadata)
+    return "<documents>" + "\n".join(
+f"""<document>
+<source>{source}</source>
+<id>{doc.metadata.get('id', "--")}</id>
+<title>{doc.metadata.get('title', "--")}</title>
+<document_content>{doc.page_content}</document_content>
+</document>""" 
+for source, doc in named_docs
+    ) + "</documents>"
 
 def merge(x):
     return x['context'] + '\n\nPrompt:' +  x['prompt']
 
+# def merge(x):
+#     # return x['context'] + '\n\nPrompt:' +  x['prompt']
+#     return x['prompt']
 
-retrieve_all = merge | RunnableParallel(
+
+retrieve_all = itemgetter('prompt') | RunnableParallel(
     {
         'www': rag, 
         'wikipedia': wiki_retriver
     }
 ).with_config(run_name="retrieve_all")
+
+map_template = """
+The following is a set of documents {docs}
+Based on this list of docs generate a total summary of the documents.
+Summary:
+"""
+
+
 
 unescape_map = {
     r'\_': '_',
@@ -100,24 +128,36 @@ class Prompt(BaseModel):
     context: str
 
 
+# summarize_prompt = PromptTemplate
+
+lsc = load_summarize_chain(mixtral, chain_type="map_reduce")
+
+def _lsc(x):
+    print(x['sources'])
+    return lsc.invoke(x['sources'])
+
 answer_chain = (
     {
     "prompt": itemgetter("prompt"),
-    "sources": lambda x: format_named_docs(x["sources"]),
+    # "sources": lambda x: format_named_docs(x["sources"]),
+    # "sources": lambda x: lsc.run(x['sources']),
+    "sources": _lsc,
     "context": itemgetter("context"),
 }
 | prompt_template
-| anthropic
+| mixtral
 | StrOutputParser()
-| get_unescape_function(unescape_map)
+# | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")
+
 
 chain = (
     (
         RunnableParallel(
             {"prompt": itemgetter("prompt") or "", "sources": retrieve_all, "context":itemgetter("context") or "None"}
         ).with_config(run_name="add_sources")
-        | RunnablePassthrough.assign(sources=fuse_docs).with_config(
+        # | RunnableParallel.assign(sources=)
+        | RunnablePassthrough.assign(sources=fuse_merge_docs).with_config(
             run_name="fuse_docs"
         )
         | RunnablePassthrough.assign(response=answer_chain).with_config(
@@ -150,9 +190,9 @@ norag_answer_chain = (
     "context": itemgetter("context"),
 }
 | prompt_template
-| chat
+| mixtral
 | StrOutputParser()
-| get_unescape_function(unescape_map)
+# | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")
 
 norag_chain = (
@@ -169,4 +209,4 @@ def read_root():
 
 if __name__ == "__main__":
     import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=4945)
+    uvicorn.run(app, host="0.0.0.0", port=4945, timeout_keep_alive=3600)
