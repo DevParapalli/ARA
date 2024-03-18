@@ -1,2 +1,1 @@
-import type { PageLoad } from "./$types";
-
+import type { PageLoad } from './$types';

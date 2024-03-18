@@ -41,23 +41,16 @@ from langchain_core.documents import (
 from langchain_community.chat_models import (
     ChatCohere
 )
-from langchain_anthropic import ChatAnthropic
 
-from langchain_groq import ChatGroq
-
+from models import claude_3_haiku
 
 from dotenv import load_dotenv
 load_dotenv()
 
 import os
 
-GROQ_KEY = os.environ.get("GROQ_KEY")
 COHERE_KEY = os.environ.get("COHERE_KEY")
-ANTHROPIC_KEY = os.environ.get('ANTHROPIC_KEY')
 
-
-mixtral = ChatGroq(temperature=.5, model="mixtral-8x7b-32768", groq_api_key=GROQ_KEY) #type: ignore
-claude_3_haiku = ChatAnthropic(model_name="claude-3-haiku-20240229", anthropic_api_key=ANTHROPIC_KEY) #type: ignore
 
 cohere_rag = CohereRagRetriever(
     llm = ChatCohere(
@@ -80,7 +73,8 @@ lotr = MergerRetriever(
 )
 
 compressor = CohereRerank(
-    cohere_api_key=COHERE_KEY
+    cohere_api_key=COHERE_KEY,
+    top_n=5
 )
 
 compression_retriever = ContextualCompressionRetriever(
@@ -130,8 +124,10 @@ You are an expert and are talking to experts, you don't need to shy away from te
 Make sure you include any mathematics or technical details if the prompt's topic contains it.\
 You don't need to summarize the content at the end of the response. When specifying references, only link to them using markdown link syntax\
 You respond in GitHub-flavored markdown. All Mathematical formulas are to be written in katex format within gfm-delimiters. Use $$ as line delimiters and $ as inline delimiters. Use \\\\ for newline within katex. \
-The expert is working with the following context, represented in an unstructured manner: {context}\
+
 You can use the following information to complete the user's prompts if you need it, you can still answer the question without using these: {sources}
+
+The expert is working with the following context: {context}
 """
 
 
@@ -162,7 +158,8 @@ chain = (
         {
             'prompt': itemgetter('prompt'),
             'sources': compression_retriever_chain,
-            'context': context_rag_chain
+            # 'context': context_rag_chain
+            'context': itemgetter('context')
         },
     )
     | RunnablePassthrough.assign(response=answer_chain).with_config(run_name="add_response")

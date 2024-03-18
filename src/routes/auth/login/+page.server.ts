@@ -10,7 +10,7 @@ export const actions = {
 
         const { data, error: err } = await locals.supabase.auth.signInWithPassword({
             email: email,
-            password: password
+            password: password,
         });
 
         if (err) {
@@ -19,17 +19,17 @@ export const actions = {
                     error: 'Invalid credentials',
                     email: email,
                     invalid: true,
-                    message: err.message
+                    message: err.message,
                 });
             }
             return fail(500, {
-                message: 'Server error. Try again later.'
+                message: 'Server error. Try again later.',
             });
         }
 
         redirect(307, '/');
     },
-}
+};
 
 export async function load({ locals: { getSession } }) {
     const session = await getSession();
