@@ -81,7 +81,7 @@
     </div>
 </div>
 
-<label for="sidebar-drawer" class="btn btn-primary drawer-button absolute bottom-0 right-0 mb-4 mr-4 lg:hidden"
+<label for="sidebar-drawer" class="btn btn-primary drawer-button absolute bottom-0 right-0 mb-6 mr-6 lg:hidden"
     >MENU</label
 >
 

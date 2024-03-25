@@ -17,5 +17,5 @@
 </script>
 
 {#key value}
-    <CartaViewer {carta} theme="github" bind:value />
+    <CartaViewer {carta} theme="ara" bind:value />
 {/key}

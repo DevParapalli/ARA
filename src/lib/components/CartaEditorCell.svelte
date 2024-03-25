@@ -29,4 +29,4 @@
     export let value = '`This` is [an](url) **_~~example~~_** **inspired** by [GitHub](https://github.com)';
 </script>
 
-<CartaEditor bind:value mode="auto" theme="github" {labels} {carta} />
+<CartaEditor bind:value mode="auto" theme="ara" {labels} {carta} />

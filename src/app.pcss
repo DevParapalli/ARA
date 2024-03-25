@@ -20,84 +20,85 @@ body {
 
 /* Carta Styles */
 
-.carta-theme__github {
+.carta-theme__ara {
     /* Core styles */
     /* Plugin emoji */
     /* Plugin slash */
 }
-.carta-theme__github.carta-editor {
-    background-color: #0d1117;
-    border: 1px solid #2b3138;
-    border-radius: 0.5rem;
+.carta-theme__ara.carta-editor {
+    background-color: oklch(var(--b3));
+    border: 1px solid oklch(var(--p));
+    border-radius: var(--rounded-box);
     @apply w-full max-w-3xl;
 }
-.carta-theme__github.carta-editor:focus-within {
-    /* outline: 2px solid #1f6feb; */
-    @apply outline-dashed outline-2 outline-blue-500;
+.carta-theme__ara.carta-editor:focus-within {
+    outline: 2px solid oklch(var(--p));
+    @apply border-transparent;
 }
-.carta-theme__github.carta-editor .carta-wrapper {
+.carta-theme__ara.carta-editor .carta-wrapper {
     padding: 1rem;
     flex-grow: 1;
     overflow-y: auto;
 }
-.carta-theme__github.carta-editor .carta-wrapper .carta-container {
-    min-height: 120px;
-    max-height: 160px;
+.carta-theme__ara.carta-editor .carta-wrapper .carta-container {
+    min-height: 2rem;
+    /* max-height: 160px; */
 }
-.carta-theme__github.carta-editor .carta-font-code {
+.carta-theme__ara.carta-editor .carta-font-code {
     font-family: 'Fira Code', monospace;
-    caret-color: white;
+    font-size: 18px;
+    caret-color: oklch(var(--nc));
 }
-.carta-theme__github.carta-editor .carta-toolbar {
+.carta-theme__ara.carta-editor .carta-toolbar {
     height: 2.5rem;
-    background-color: #161b22;
-    border-bottom: 1px solid #2b3138;
+    background-color: oklch(var(--b2));
+    border-bottom: var(--tab-border, 1px) solid oklch(var(--s));
     padding-right: 12px;
-    border-top-left-radius: 0.5rem;
-    border-top-right-radius: 0.5rem;
+    border-top-left-radius: var(--rounded-box);
+    border-top-right-radius: var(--rounded-box);
 }
-.carta-theme__github.carta-editor .carta-toolbar .carta-icon {
+.carta-theme__ara.carta-editor .carta-toolbar .carta-icon {
     width: 2rem;
     height: 2rem;
 }
-.carta-theme__github.carta-editor .carta-toolbar .carta-icon:hover {
-    color: white;
-    background-color: #2b3138;
+.carta-theme__ara.carta-editor .carta-toolbar .carta-icon:hover {
+    color: oklch(var(--bc));
+    background-color: oklch(var(--b1));
 }
-.carta-theme__github.carta-editor .carta-toolbar-left > *:first-child {
-    border-top-left-radius: 0.5rem;
+.carta-theme__ara.carta-editor .carta-toolbar-left > *:first-child {
+    border-top-left-radius: var(--rounded-box);
 }
-.carta-theme__github.carta-editor .carta-toolbar-left > * {
+.carta-theme__ara.carta-editor .carta-toolbar-left > * {
     padding-left: 1rem;
     padding-right: 1rem;
     font-size: 0.95rem;
 }
-.carta-theme__github.carta-editor .carta-toolbar-left .carta-active {
+.carta-theme__ara.carta-editor .carta-toolbar-left .carta-active {
     height: 100%;
-    background-color: #0d1117;
+    background-color: oklch(var(--b3));
     transform: translateY(1px);
-    color: white;
-    border-right: 1px solid #2b3138;
-    border-bottom: 1px solid #0d1117;
+    color: oklch(var(--bc));
+    border-right: 1px solid oklch(var(--b1));
+    /* border-bottom: 2px solid oklch(var(--b3)); */
 }
-.carta-theme__github.carta-editor .carta-toolbar-left .carta-active:not(:first-child) {
-    border-left: 1px solid #2b3138;
+.carta-theme__ara.carta-editor .carta-toolbar-left .carta-active:not(:first-child) {
+    border-left: 1px solid oklch(var(--b1));
 }
-.carta-theme__github.carta-editor [class*='shj-lang-'] {
+.carta-theme__ara.carta-editor [class*='shj-lang-'] {
     background: transparent;
 }
-.carta-theme__github.carta-emoji {
+.carta-theme__ara.carta-emoji {
     width: 18rem;
     max-height: 14rem;
     overflow-y: scroll;
     border-radius: 4px;
     font-family: inherit;
-    background-color: #0d1117;
+    background-color: oklch(var(--b3));
     padding: 6px;
     scroll-padding: 6px;
     gap: 6px;
 }
-.carta-theme__github.carta-emoji button {
+.carta-theme__ara.carta-emoji button {
     background: #161b22;
     aspect-ratio: 1;
     border-radius: 4px;
@@ -107,58 +108,214 @@ body {
     font-size: 1.2rem;
     line-height: 100%;
 }
-.carta-theme__github.carta-emoji button:hover,
-.carta-theme__github.carta-emoji button.carta-active {
-    background: #2b3138;
+.carta-theme__ara.carta-emoji button:hover,
+.carta-theme__ara.carta-emoji button.carta-active {
+    background: oklch(var(--b1));
 }
-.carta-theme__github.carta-slash {
+.carta-theme__ara.carta-slash {
     width: 18rem;
     max-height: 14rem;
     overflow-y: scroll;
     border-radius: 4px;
     font-family: inherit;
-    background-color: #0d1117;
+    background-color: oklch(var(--b3));
     padding: 6px;
     scroll-padding: 6px;
 }
-.carta-theme__github.carta-slash span {
+.carta-theme__ara.carta-slash span {
     width: fit-content;
 }
-.carta-theme__github.carta-slash button {
+.carta-theme__ara.carta-slash button {
     background: none;
     width: 100%;
     padding: 10px;
     border: 0;
     border-radius: 4px;
 }
-.carta-theme__github.carta-slash .carta-slash-group {
+.carta-theme__ara.carta-slash .carta-slash-group {
     padding: 0 4px 0 4px;
     margin-bottom: 4px;
     font-size: 0.8rem;
 }
-.carta-theme__github.carta-slash button.carta-active,
-.carta-theme__github.carta-slash button:hover {
+.carta-theme__ara.carta-slash button.carta-active,
+.carta-theme__ara.carta-slash button:hover {
     background: #161b22;
     cursor: pointer;
 }
-.carta-theme__github.carta-slash .carta-snippet-title {
+.carta-theme__ara.carta-slash .carta-snippet-title {
     font-size: 0.85rem;
     font-weight: 600;
 }
-.carta-theme__github.carta-slash .carta-snippet-description {
+.carta-theme__ara.carta-slash .carta-snippet-description {
     font-size: 0.8rem;
     text-overflow: ellipsis;
 }
 
 .markdown-body {
-    @apply prose;
+    /* @apply prose; */
 }
 
 .carta-input-wrapper textarea {
     @apply focus:border-transparent focus:outline-none focus:ring-0 focus:ring-blue-500;
 }
 
+div.carta-input-wrapper {
+    min-height: 2rem;
+}
+
+div[role='textbox'] {
+    min-height: 2rem;
+    cursor: text;
+}
+
+/* hack for ux lmao */
+textarea#md {
+    min-height: 1.5rem;
+    padding-left: 5px; /* for the code plugin's highlighter */
+}
+
 .carta-viewer {
-    background-color: #0d1117;
+    background-color: oklch(var(--b3));
     @apply w-full max-w-3xl rounded-lg px-4;
+}
+
+.carta-input {
+    height: 100%;
+}
+
+
+/* Code Highlighter Classes */
+
+[class*='shj-lang-'] {
+    white-space: pre;
+    margin: 10px 0;
+    border-radius: 10px;
+    padding: 30px 20px;
+    background: white;
+    color: #112;
+    box-shadow: 0 0 5px #0001;
+    text-shadow: none;
+    font-family: "Fira Code", monospace;
+    font-size: 18px;
+    line-height: 24px;
+    box-sizing: border-box;
+    max-width: min(100%, 100vw);
+}
+.shj-inline {
+    margin: 0;
+    padding: 2px 5px;
+    display: inline-block;
+    border-radius: 5px;
+}
+[class*='shj-lang-']::selection,
+[class*='shj-lang-'] ::selection {
+    background: #bdf5;
+}
+[class*='shj-lang-'] > div {
+    display: flex;
+    overflow: auto;
+}
+[class*='shj-lang-'] > div :last-child {
+    flex: 1;
+    outline: none;
+}
+.shj-numbers {
+    padding-left: 5px;
+    counter-reset: line;
+}
+.shj-numbers div {
+    padding-right: 5px;
+}
+.shj-numbers div:before {
+    color: #999;
+    display: block;
+    content: counter(line);
+    opacity: 0.5;
+    text-align: right;
+    margin-right: 5px;
+    counter-increment: line;
+}
+.shj-syn-cmnt {
+    font-style: italic;
+}
+.shj-syn-err,
+.shj-syn-kwd {
+    color: #e16;
+}
+.shj-syn-num,
+.shj-syn-class {
+    color: #f60;
+}
+.shj-numbers,
+.shj-syn-cmnt {
+    color: #999;
+}
+.shj-syn-insert,
+.shj-syn-str {
+    color: #7d8;
+}
+.shj-syn-bool {
+    color: #3bf;
+}
+.shj-syn-type,
+.shj-syn-oper {
+    color: #5af;
+}
+.shj-syn-section,
+.shj-syn-func {
+    color: #84f;
+}
+.shj-syn-deleted,
+.shj-syn-var {
+    color: #f44;
+}
+.shj-oneline {
+    padding: 12px 10px;
+}
+.shj-lang-http.shj-oneline .shj-syn-kwd {
+    background: #25f;
+    color: #fff;
+    padding: 5px 7px;
+    border-radius: 5px;
+}
+[class*='shj-lang-'] {
+    color: #c9d1d9;
+    background: #161b22;
+}
+[class*='shj-lang-']:before {
+    color: #6f9aff;
+}
+.shj-syn-insert {
+    color: #98c379;
+}
+.shj-syn-deleted,
+.shj-syn-err,
+.shj-syn-kwd {
+    color: #ff7b72;
+}
+.shj-syn-class {
+    color: #ffa657;
+}
+.shj-numbers,
+.shj-syn-cmnt {
+    color: #8b949e;
+}
+.shj-syn-type,
+.shj-syn-oper,
+.shj-syn-num,
+.shj-syn-section,
+.shj-syn-var,
+.shj-syn-bool {
+    color: #79c0ff;
+}
+.shj-syn-str {
+    color: #a5d6ff;
+}
+.shj-syn-func {
+    color: #d2a8ff;
+}
+
+.carta-editor:focus-within ~ .cell-actions {
+    outline: 2px solid oklch(var(--p));
+    @apply border-transparent;
 }
