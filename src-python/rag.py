@@ -42,7 +42,7 @@ from langchain_community.chat_models import (
     ChatCohere
 )
 
-from models import claude_3_haiku
+from models import claude_3_haiku, mixtral_groq
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -148,7 +148,8 @@ answer_chain = (
         },
     )
     | answer_prompt_template
-    | claude_3_haiku
+    # | claude_3_haiku
+    | mixtral_groq
     | StrOutputParser()
 )
 

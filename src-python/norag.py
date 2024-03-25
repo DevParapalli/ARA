@@ -4,7 +4,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from operator import itemgetter
 
-from models import claude_3_haiku
+from models import claude_3_haiku,mixtral_groq
 
 system_message = """
 You don't deny any request unless absolutely necessary.\
@@ -33,6 +33,7 @@ chain = (
         },
     )
     | norag_prompt_template
-    | claude_3_haiku
+    # | claude_3_haiku
+    | mixtral_groq
     | StrOutputParser()
 )

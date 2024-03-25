@@ -38,20 +38,31 @@
     let promptValue = '';
 
     function handleAddCellAI() {
-        supabase
-            .from('cells')
-            .insert({ notebook: $page.params.id, content: promptValue })
-            .select()
-            .single()
-            .then(({ data, error }) => {
-                error ? console.error(error) : dev && console.log(data);
-                if (data) {
-                    cells = [...cells, data];
-                }
-            });
+        // supabase
+        //     .from('cells')
+        //     .insert({ notebook: $page.params.id, content: promptValue })
+        //     .select()
+        //     .single()
+        //     .then(({ data, error }) => {
+        //         error ? console.error(error) : dev && console.log(data);
+        //         if (data) {
+        //             cells = [...cells, data];
+        //         }
+        //     });
+        
+        let new_cell = { id: 'ABC', notebook: $page.params.id, content: promptValue };
+        cells = [...cells, new_cell];
+            
+        setTimeout(() => {
+            cells[cells.length - 1].content = 'AI generated content';
+            console.log('AI generated content');
+        }, 1000)
 
         const modal = document.getElementById('ai_prompt_modal');
         modal?.close();
+
+        
+
 
         promptValue = '';
     }
@@ -65,6 +76,9 @@
                 if (e.currentTarget.contains(e.relatedTarget)) {
                     return;
                 }
+                if (cell.id === undefined) {
+                    return;
+                } // prevent test cell from updating
                 supabase
                     .from('cells')
                     .upsert({ id: cell.id, content: cell.content, notebook: $page.params.id })
@@ -102,7 +116,7 @@
             <div class="modal-action">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
-                    <button on:click|preventDefault={() => {}} class="btn btn-primary w-20">Submit</button>
+                    <button on:click|preventDefault={handleAddCellAI} class="btn btn-primary w-20">Submit</button>
                     <button class="btn btn-error w-20">Cancel</button>
                 </form>
             </div>
