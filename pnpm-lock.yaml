@@ -19,7 +19,7 @@ dependencies:
     version: 3.1.0(carta-md@3.5.0)(marked@9.1.6)(svelte@4.2.11)
   '@cartamd/plugin-math':
     specifier: ^3.0.2
-    version: 3.0.2(carta-md@3.5.0)(katex@0.16.9)(marked@9.1.6)
+    version: 3.0.2(carta-md@3.5.0)(katex@0.16.10)(marked@9.1.6)
   '@cartamd/plugin-slash':
     specifier: ^3.1.0
     version: 3.1.0(carta-md@3.5.0)(svelte@4.2.11)
@@ -48,8 +48,8 @@ dependencies:
     specifier: ^2.4.0
     version: 2.4.0
   katex:
-    specifier: ^0.16.9
-    version: 0.16.9
+    specifier: ^0.16.10
+    version: 0.16.10
   rehype-highlight:
     specifier: ^7.0.0
     version: 7.0.0
@@ -229,7 +229,7 @@ packages:
       svelte: 4.2.11
     dev: false
 
-  /@cartamd/plugin-math@3.0.2(carta-md@3.5.0)(katex@0.16.9)(marked@9.1.6):
+  /@cartamd/plugin-math@3.0.2(carta-md@3.5.0)(katex@0.16.10)(marked@9.1.6):
     resolution: {integrity: sha512-c5toPHMGGtfZQVvejBaozVcuWLq969OPAfpX53vN0m/6HrYEEaqluuh8STXnBULoIbZmJKQLz75Q7Sb7Fkf3Yg==}
     peerDependencies:
       carta-md: ^3.0.0
@@ -237,7 +237,7 @@ packages:
       marked: ^9.1.5
     dependencies:
       carta-md: 3.5.0(svelte@4.2.11)
-      katex: 0.16.9
+      katex: 0.16.10
       marked: 9.1.6
     dev: false
 
@@ -2492,8 +2492,8 @@ packages:
     resolution: {integrity: sha512-AilxAyFOAcK5wA1+LeaySVBrHsGQvUFCDWXKpZjzaL0PqW+xfBOttn8GNtWKFWqneyMZj41MWF9Kl6iPWLwgOA==}
     dev: true
 
-  /katex@0.16.9:
-    resolution: {integrity: sha512-fsSYjWS0EEOwvy81j3vRA8TEAhQhKiqO+FQaKWp0m39qwOzHVBgAUBIXWj1pB+O2W3fIpNa6Y9KSKCVbfPhyAQ==}
+  /katex@0.16.10:
+    resolution: {integrity: sha512-ZiqaC04tp2O5utMsl2TEZTXxa6WSC4yo0fv5ML++D3QZv/vx2Mct0mTlRx3O+uUkjfuAgOkzsCmq5MiUEsDDdA==}
     hasBin: true
     dependencies:
       commander: 8.3.0
@@ -2908,7 +2908,7 @@ packages:
     dependencies:
       '@types/katex': 0.16.7
       devlop: 1.1.0
-      katex: 0.16.9
+      katex: 0.16.10
       micromark-factory-space: 2.0.0
       micromark-util-character: 2.1.0
       micromark-util-symbol: 2.0.0
