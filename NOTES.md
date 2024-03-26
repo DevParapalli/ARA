@@ -114,3 +114,7 @@
 -   <https://github.com/langchain-ai/langserve/blob/main/examples/passthrough_dict/server.py>
 
 -   <https://github.com/langchain-ai/langserve/blob/main/examples/passthrough_dict/client.ipynb>
+
+## Hosting Server
+
+- <https://fly.io/docs/languages-and-frameworks/python/>
