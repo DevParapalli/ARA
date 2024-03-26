@@ -9,7 +9,7 @@
     $: ({ supabase } = data);
 
     onMount(async () => {
-        supabase.auth.onAuthStateChange((event, _session) => {
+        const _s = await supabase.auth.onAuthStateChange((event, _session) => {
             // If you want to fain grain which routes should rerun their load function
             // when onAuthStateChange changges
             // use invalidate('supabase:auth')
@@ -21,7 +21,11 @@
             invalidate('supabase:auth');
             invalidateAll();
         });
-        return () => subscription.unsubscribe();
+
+        const theme = localStorage.getItem('theme') ?? 'black';
+        document.documentElement.setAttribute('data-theme', theme);
+        
+        return () => _s.data.subscription.unsubscribe();
     });
 
     const submitLogout = async ({ cancel }) => {

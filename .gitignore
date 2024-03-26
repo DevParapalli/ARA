@@ -159,7 +159,7 @@ dist/
 downloads/
 eggs/
 .eggs/
-lib/
+# lib/ # removed for sveltekit stuff
 lib64/
 parts/
 sdist/

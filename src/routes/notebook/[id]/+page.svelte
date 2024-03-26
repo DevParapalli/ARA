@@ -20,7 +20,7 @@
     let cells: Tables<'cells'>[] = [];
     onMount(() => {
         (async () => {
-            const { data, error } = await supabase.from('cells').select('*').eq('notebook', $page.params.id);
+            const { data, error } = await supabase.from('cells').select('*').eq('notebook', $page.params.id).order('created_at', { ascending: true });
             dev && console.log(data, error);
             if (data) {
                 cells = data;

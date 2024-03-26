@@ -17,7 +17,7 @@
             }),
             emoji(),
             slash(),
-            code(),
+            code({autoDetect: 'true', lineNumbering: false}),
             math(),
         ],
         sanitizer: DOMPurify.sanitize,
