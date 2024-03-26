@@ -21,13 +21,13 @@
     onMount(() => {
         (async () => {
             const { data, error } = await supabase.from('cells').select('*').eq('notebook', $page.params.id).order('created_at', { ascending: true });
-            dev && console.log(data, error);
+            dev && console.debug(data, error);
             if (data) {
                 cells = data;
             } else {
                 console.error(error);
             }
-        })();
+        })(); 
 
         heartbeat().then((status) => {
             if (status) {
@@ -47,7 +47,7 @@
             .select()
             .single()
             .then(({ data, error }) => {
-                error ? console.error(error) : dev && console.log(data);
+                error ? console.error(error) : dev && console.debug(data);
                 if (data) {
                     cells = [...cells, data];
                 }
@@ -74,7 +74,7 @@
             .select()
             .single()
             .then(({ data, error }) => {
-                error ? console.error(error) : dev && console.log(data);
+                error ? console.error(error) : dev && console.debug(data);
                 if (data) {
                     cells = [...cells, data];
                 }
@@ -92,7 +92,7 @@
 
         (async () => {
             const result = await remoteChain.stream({ prompt: promptValue, context: convert_cells_to_context(cells) });
-            console.log("Result", result);
+            console.debug("Result", result);
             for await (const chunk of result) {
                 if (typeof chunk === 'string') {
                     response += chunk;
@@ -106,13 +106,13 @@
                     response += chunk['response'] as string;
                 } else {
                     other = chunk;
-                    console.log(chunk);
+                    console.debug(chunk);
                 }
 
                 cells[cells.length - 1].content += response;
             }
 
-            console.log(metadata, sources, response)
+            console.debug(metadata, sources, response)
             
             cells[cells.length - 1].metadata = metadata;
             cells[cells.length - 1].metadata.sources = sources;
@@ -121,7 +121,7 @@
             if (error || !data) {
                 console.error(error);
             } else {
-                console.log(data);
+                console.debug(data);
                 cells[cells.length - 1] = data;
             }
         })();
@@ -168,18 +168,29 @@
                     .from('cells')
                     .upsert({ id: cell.id, content: cell.content, notebook: $page.params.id })
                     .then(({ data, error }) => {
-                        error ? console.error(error) : dev && console.log(data);
+                        error ? console.error(error) : dev && console.debug(data);
                     });
             }}
             class="flex flex-col h-fit w-full justify-center items-center p-4"
         >
             <CartaEditorCell bind:value={cell.content} />
-        <div class="cell-actions flex justify-center min-w-32 bg-base-300 rounded-t-none rounded-b-box border border-t-0 border-primary">
-            <span>XNX</span>
+        <div class="cell-actions flex justify-center min-w-32 xl:min-w-[50%] bg-base-300 rounded-t-none rounded-b-box border border-t-0 border-primary">
+            <span>Cell-level actions.</span>
         </div>
         </div>
+
+
+    {:else}
+    <div class="flex flex-col items-center p-10 w-full">
+        <div class="skeleton h-96 w-full"></div>
+        <div class="skeleton h-6 w-[50%] mb-10"></div>
+        <div class="skeleton h-6 w-[50%] mb-10"></div>
+        <!-- <div class="skeleton h-4 w-full"></div> -->
+        <!-- <div class="skeleton h-4 w-full"></div> -->
+    </div>
     {/each}
 
+    {#if supabase && supabase.auth.getSession()}
     <div class="flex flex-row items-center justify-center gap-4">
         <button class="btn btn-primary" on:click={handleAddCellUser}>Add User Cell</button>
         <button
@@ -192,6 +203,12 @@
             }}>Add AI Cell</button
         >
     </div>
+    {:else}
+    <div class="flex flex-row w-full justify-center gap-4">
+        <div class="skeleton h-12 w-32"></div>
+        <div class="skeleton h-12 w-32"></div>
+    </div>
+    {/if}
 
     <dialog id="ai_prompt_modal" class="modal">
         <div class="modal-box">

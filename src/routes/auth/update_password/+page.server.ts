@@ -20,7 +20,7 @@ export const actions = {
             password,
         });
 
-        dev && console.log(data, err);
+        dev && console.debug(data, err);
 
         if (err) {
             if (err instanceof AuthApiError && err.status >= 400 && err.status < 500) {

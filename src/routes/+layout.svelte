@@ -31,7 +31,7 @@
     const submitLogout = async ({ cancel }) => {
         const { error } = await data.supabase.auth.signOut();
         if (error) {
-            console.log(error);
+            console.debug(error);
         }
         cancel();
         await goto('/');

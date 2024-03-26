@@ -1,6 +1,6 @@
-const daisyui = require('daisyui');
-const typography = require('@tailwindcss/typography');
-const forms = require('@tailwindcss/forms');
+import daisyui from 'daisyui';
+import typography from '@tailwindcss/typography';
+import forms from '@tailwindcss/forms';
 
 /** @type {import('tailwindcss').Config}*/
 const config = {

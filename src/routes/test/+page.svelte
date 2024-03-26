@@ -75,7 +75,7 @@
             response = JSON.stringify(_data);
         } catch (e) {
             alert('local server not running');
-            console.log(e);
+            console.error(e);
             isloading = false;
             return;
         }
@@ -110,7 +110,7 @@
             const res = await fetch('http://localhost:4945');
         } catch (e) {
             alert('local server not running');
-            console.log(e);
+            console.debug(e);
             isloading = false;
             return;
         }
@@ -164,7 +164,7 @@
                     response += chunk['response'] as string;
                 } else {
                     // other = chunk
-                    console.log(chunk);
+                    console.debug(chunk);
                 }
             }
         } catch (error) {
@@ -175,7 +175,7 @@
         const { data, error } = await $page.data.supabase
             .from('llm_runs')
             .upsert({ id: metadata['run_id'], prompt: prompt, context: context, response: response, sources: sources });
-        console.log(response, metadata, sources);
+        console.debug(response, metadata, sources);
         // console.log(JSON.parse(result as string))
         isloading = false;
     }
@@ -186,7 +186,7 @@
             const res = await fetch('http://localhost:4945');
         } catch (e) {
             alert('local server not running');
-            console.log(e);
+            console.debug(e);
             isloading = false;
             return;
         }
@@ -213,7 +213,7 @@
                 response += chunk['response'] as string;
             } else {
                 other = chunk;
-                console.log(chunk);
+                console.debug(chunk);
             }
         }
         // data = result as string
