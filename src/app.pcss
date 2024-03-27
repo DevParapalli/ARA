@@ -29,7 +29,7 @@ body {
     background-color: oklch(var(--b3));
     border: 1px solid oklch(var(--p));
     border-radius: var(--rounded-box);
-    @apply w-full max-w-3xl;
+    @apply w-full;
 }
 .carta-theme__ara.carta-editor:focus-within {
     outline: 2px solid oklch(var(--p));
@@ -176,13 +176,12 @@ textarea#md {
 
 .carta-viewer {
     background-color: oklch(var(--b3));
-    @apply w-full max-w-3xl rounded-lg px-4;
+    @apply w-full rounded-lg px-4;
 }
 
 .carta-input {
     height: 100%;
 }
-
 
 /* Code Highlighter Classes */
 
@@ -195,7 +194,7 @@ textarea#md {
     color: #112;
     box-shadow: 0 0 5px #0001;
     text-shadow: none;
-    font-family: "Fira Code", monospace;
+    font-family: 'Fira Code', monospace;
     font-size: 18px;
     line-height: 24px;
     box-sizing: border-box;

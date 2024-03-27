@@ -38,7 +38,13 @@ from langchain_core.documents import (
     Document
 )
 
-from models import claude_3_haiku, mixtral_groq, command_r_cohere, chat_command_r_cohere
+from models import (
+    claude_3_haiku, 
+    mixtral_groq, 
+    command_r_cohere, 
+    chat_command_r_cohere, 
+    chat_cohere
+)
 
 from dotenv import load_dotenv
 load_dotenv()
@@ -49,7 +55,7 @@ COHERE_KEY = os.environ.get("COHERE_KEY")
 
 
 cohere_rag = CohereRagRetriever(
-    llm = chat_command_r_cohere,
+    llm = chat_cohere,
 )
 
 wikipedia_rag = WikipediaRetriever(
@@ -146,7 +152,7 @@ answer_chain = (
     | answer_prompt_template
     # | claude_3_haiku
     # | mixtral_groq
-    | command_r_cohere
+    | chat_command_r_cohere
     | StrOutputParser()
 )
 

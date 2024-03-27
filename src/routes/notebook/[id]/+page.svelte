@@ -20,20 +20,24 @@
     let cells: Tables<'cells'>[] = [];
     onMount(() => {
         (async () => {
-            const { data, error } = await supabase.from('cells').select('*').eq('notebook', $page.params.id).order('created_at', { ascending: true });
+            const { data, error } = await supabase
+                .from('cells')
+                .select('*')
+                .eq('notebook', $page.params.id)
+                .order('created_at', { ascending: true });
             dev && console.debug(data, error);
             if (data) {
                 cells = data;
             } else {
                 console.error(error);
             }
-        })(); 
+        })();
 
         heartbeat().then((status) => {
             if (status) {
                 ai_cell_disabled = false;
             }
-        })
+        });
         const interval = setInterval(heartbeat, 20000);
         return () => {
             clearInterval(interval);
@@ -92,7 +96,7 @@
 
         (async () => {
             const result = await remoteChain.stream({ prompt: promptValue, context: convert_cells_to_context(cells) });
-            console.debug("Result", result);
+            console.debug('Result', result);
             for await (const chunk of result) {
                 if (typeof chunk === 'string') {
                     response += chunk;
@@ -112,12 +116,16 @@
                 cells[cells.length - 1].content += response;
             }
 
-            console.debug(metadata, sources, response)
-            
+            console.debug(metadata, sources, response);
+
             cells[cells.length - 1].metadata = metadata;
             cells[cells.length - 1].metadata.sources = sources;
             cells[cells.length - 1].content = response;
-            const {data, error} = await supabase.from('cells').upsert(cells[cells.length - 1]).select().single();
+            const { data, error } = await supabase
+                .from('cells')
+                .upsert(cells[cells.length - 1])
+                .select()
+                .single();
             if (error || !data) {
                 console.error(error);
             } else {
@@ -153,61 +161,60 @@
     }
 </script>
 
-<div class="flex flex-col items-center p-10 relative">
+<div class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
-        <div
-            on:focusout={(e) => {
-                //@ts-ignore
-                if (e.currentTarget.contains(e.relatedTarget)) {
-                    return;
-                }
-                if (cell.id === undefined) {
-                    return;
-                } // prevent test cell from updating
-                supabase
-                    .from('cells')
-                    .upsert({ id: cell.id, content: cell.content, notebook: $page.params.id })
-                    .then(({ data, error }) => {
-                        error ? console.error(error) : dev && console.debug(data);
-                    });
-            }}
-            class="flex flex-col h-fit w-full justify-center items-center p-4"
-        >
-            <CartaEditorCell bind:value={cell.content} />
-        <div class="cell-actions flex justify-center min-w-32 xl:min-w-[50%] bg-base-300 rounded-t-none rounded-b-box border border-t-0 border-primary">
-            <span>Cell-level actions.</span>
+        <div class="w-full">
+            <div
+                on:focusout={(e) => {
+                    //@ts-ignore
+                    if (e.currentTarget.contains(e.relatedTarget)) {
+                        return;
+                    }
+                    if (cell.id === undefined) {
+                        return;
+                    } // prevent test cell from updating
+                    supabase
+                        .from('cells')
+                        .upsert({ id: cell.id, content: cell.content, notebook: $page.params.id })
+                        .then(({ data, error }) => {
+                            error ? console.error(error) : dev && console.debug(data);
+                        });
+                }}
+                class="flex h-fit w-full flex-col items-center justify-center p-4">
+                <CartaEditorCell bind:value={cell.content} />
+                <div
+                    class="cell-actions flex min-w-32 justify-center rounded-b-box rounded-t-none border border-t-0 border-primary bg-base-300 xl:min-w-[50%]">
+                    <div>Cell-level actions.</div>
+                </div>
+            </div>
         </div>
-        </div>
-
-
     {:else}
-    <div class="flex flex-col items-center p-10 w-full">
-        <div class="skeleton h-96 w-full"></div>
-        <div class="skeleton h-6 w-[50%] mb-10"></div>
-        <div class="skeleton h-6 w-[50%] mb-10"></div>
-        <!-- <div class="skeleton h-4 w-full"></div> -->
-        <!-- <div class="skeleton h-4 w-full"></div> -->
-    </div>
+        <div class="flex flex-col items-center p-10 w-full">
+            <div class="skeleton h-96 w-full"></div>
+            <div class="skeleton h-6 w-[50%] mb-10"></div>
+            <div class="skeleton h-6 w-[50%] mb-10"></div>
+            <!-- <div class="skeleton h-4 w-full"></div> -->
+            <!-- <div class="skeleton h-4 w-full"></div> -->
+        </div>
     {/each}
 
     {#if supabase && supabase.auth.getSession()}
-    <div class="flex flex-row items-center justify-center gap-4">
-        <button class="btn btn-primary" on:click={handleAddCellUser}>Add User Cell</button>
-        <button
-            disabled={ai_cell_disabled}
-            class="btn btn-secondary"
-            on:click={() => {
-                // ai_cell_disabled = true;
-                const modal = document.getElementById('ai_prompt_modal');
-                modal?.showModal();
-            }}>Add AI Cell</button
-        >
-    </div>
+        <div class="flex flex-row items-center justify-center gap-4">
+            <button class="btn btn-primary" on:click={handleAddCellUser}>Add User Cell</button>
+            <button
+                disabled={ai_cell_disabled}
+                class="btn btn-secondary"
+                on:click={() => {
+                    // ai_cell_disabled = true;
+                    const modal = document.getElementById('ai_prompt_modal');
+                    modal?.showModal();
+                }}>Add AI Cell</button>
+        </div>
     {:else}
-    <div class="flex flex-row w-full justify-center gap-4">
-        <div class="skeleton h-12 w-32"></div>
-        <div class="skeleton h-12 w-32"></div>
-    </div>
+        <div class="flex w-full flex-row justify-center gap-4">
+            <div class="skeleton h-12 w-32"></div>
+            <div class="skeleton h-12 w-32"></div>
+        </div>
     {/if}
 
     <dialog id="ai_prompt_modal" class="modal">
@@ -218,8 +225,7 @@
                 type="text"
                 placeholder="Give instructions for setting up..."
                 class="input input-primary w-full font-mono"
-                bind:value={promptValue}
-            />
+                bind:value={promptValue} />
             <div class="modal-action">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
@@ -228,14 +234,13 @@
                         on:click={() => {
                             ai_cell_disabled = false;
                         }}
-                        class="btn btn-error w-20">Cancel</button
-                    >
+                        class="btn btn-error w-20">Cancel</button>
                 </form>
             </div>
         </div>
     </dialog>
 
-    <div class="fixed right-6 bottom-0">
+    <div class="fixed bottom-0 right-6">
         <span class={conn_status_flag}>{conn_status}</span>
     </div>
 </div>

@@ -17,7 +17,7 @@
             }),
             emoji(),
             slash(),
-            code({autoDetect: 'true', lineNumbering: false}),
+            code({ autoDetect: 'true', lineNumbering: false }),
             math(),
         ],
         sanitizer: DOMPurify.sanitize,
@@ -29,4 +29,4 @@
     export let value = '`This` is [an](url) **_~~example~~_** **inspired** by [GitHub](https://github.com)';
 </script>
 
-<CartaEditor bind:value mode="auto" theme="ara" {labels} {carta} />
+<CartaEditor bind:value mode="tabs" theme="ara" {labels} {carta} />

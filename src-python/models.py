@@ -20,5 +20,6 @@ from langchain_community.chat_models import ChatCohere
 
 COHERE_KEY = os.environ.get("COHERE_KEY")
 
-command_r_cohere = Cohere(model='command-r', cohere_api_key=COHERE_KEY) #type: ignore
-chat_command_r_cohere = ChatCohere(model='command-r', cohere_api_key=COHERE_KEY) #type: ignore
+command_r_cohere = Cohere(cohere_api_key=COHERE_KEY) #type: ignore
+chat_command_r_cohere = ChatCohere(model="command-r", cohere_api_key=COHERE_KEY) #type: ignore
+chat_cohere = ChatCohere(cohere_api_key=COHERE_KEY) #type: ignore

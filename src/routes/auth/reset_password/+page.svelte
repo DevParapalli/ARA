@@ -9,8 +9,7 @@
     <form action="?/reset_password" method="POST" class="form-control items-start gap-2" use:enhance>
         {#if form?.invalid}<div
                 transition:fade
-                class="flex w-full justify-center rounded-sm bg-error py-1 text-error-content"
-            >
+                class="flex w-full justify-center rounded-sm bg-error py-1 text-error-content">
                 <span>{form?.message}</span>
             </div>{/if}
         <div class="label">

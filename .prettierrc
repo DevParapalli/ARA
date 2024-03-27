@@ -5,6 +5,7 @@
     "trailingComma": "es5",
     "printWidth": 120,
     "plugins": ["prettier-plugin-svelte", "prettier-plugin-tailwindcss"],
+    "bracketSameLine": true,
     "overrides": [
         {
             "files": "*.svelte",

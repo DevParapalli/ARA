@@ -243,8 +243,8 @@
     <!-- <p>Visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to read the documentation</p> -->
     <button
         on:click={test_localhost_interval}
-        class="{status_flag.includes('success') ? 'invisible' : 'visible'} btn btn-info btn-sm">Retry Connection</button
-    >
+        class="{status_flag.includes('success') ? 'invisible' : 'visible'} btn btn-info btn-sm"
+        >Retry Connection</button>
     <button disabled={isloading} on:click={test_langserve_rag} class="btn btn-primary">Test with RAG</button>
     <button disabled={isloading} on:click={test_langserve_norag} class="btn btn-secondary">Test without RAG</button>
     <div class="flex w-full items-center justify-center">
