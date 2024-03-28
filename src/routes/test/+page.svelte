@@ -150,22 +150,14 @@
         response = '';
         metadata = {};
         sources = [];
+        let rag_chunk;
         try {
             for await (const chunk of result) {
-                if (typeof chunk === 'string') {
-                    response += chunk;
-                    continue;
-                }
-                if ('run_id' in (chunk as object) || 'prompt' in (chunk as object) || 'context' in (chunk as object)) {
-                    metadata = Object.assign(metadata, chunk);
-                } else if ('sources' in (chunk as object)) {
-                    sources = chunk as Array<object>;
-                } else if ('response' in (chunk as object)) {
-                    response += chunk['response'] as string;
-                } else {
-                    // other = chunk
-                    console.debug(chunk);
-                }
+                console.debug(chunk);
+                response += chunk.content ?? "";
+                sources = chunk.response_metadata?.documents ?? [];
+                // response += JSON.stringify(chunk);
+                metadata = chunk['response_metadata'] ?? {};
             }
         } catch (error) {
             console.error('Error during retrieval:', error);
@@ -212,9 +204,10 @@
             } else if ('response' in (chunk as object)) {
                 response += chunk['response'] as string;
             } else {
-                other = chunk;
+                other.merge(chunk);
                 console.debug(chunk);
             }
+            // console.debug(chunk);
         }
         // data = result as string
         const { data, error } = await $page.data.supabase

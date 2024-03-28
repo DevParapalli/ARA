@@ -22,7 +22,7 @@
             invalidateAll();
         });
 
-        const theme = localStorage.getItem('theme') ?? 'black';
+        const theme = localStorage.getItem('theme') ?? 'dim';
         document.documentElement.setAttribute('data-theme', theme);
 
         return () => _s.data.subscription.unsubscribe();

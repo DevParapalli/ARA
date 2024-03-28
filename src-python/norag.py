@@ -4,7 +4,7 @@ from langchain_core.output_parsers import StrOutputParser
 
 from operator import itemgetter
 
-from models import claude_3_haiku,mixtral_groq
+from models import claude_3_haiku,mixtral_groq, chat_command_r_cohere
 
 system_message = """
 You are ARA, a intelligent research assistant created by Team ARA of Government College of Engineering, Nagpur.
@@ -39,5 +39,6 @@ chain = (
     | norag_prompt_template
     # | claude_3_haiku
     | mixtral_groq
+    # | chat_command_r_cohere
     | StrOutputParser()
 )
