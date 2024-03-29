@@ -4,10 +4,10 @@ function convert_cells_to_context(cells: Tables<'cells'>[]): string {
     let context = '';
     cells.forEach((cell) => {
         context +=
-            '<document>' +
+            '<doc>' +
             `<id>${cell.id}</id>` +
-            `<document_content>${cell.content}</document_content>` +
-            '</document>\n';
+            `<text>${cell.content}</text>` +
+            '</doc>\n';
     });
     return context;
 }

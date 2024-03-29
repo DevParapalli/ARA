@@ -7,6 +7,7 @@
     import { math } from '@cartamd/plugin-math';
     import 'carta-md/dark.css';
     import DOMPurify from 'isomorphic-dompurify';
+    import { onMount } from 'svelte';
 
     const carta = new Carta({
         extensions: [
@@ -27,6 +28,12 @@
         previewTab: 'View',
     };
     export let value = '`This` is [an](url) **_~~example~~_** **inspired** by [GitHub](https://github.com)';
+
+
+    onMount(() => {
+        // carta.element?.querySelector('.carta-toolbar-left button:last-child')?.click();
+        // Hack to make the editor cell, view first
+    });
 </script>
 
 <CartaEditor bind:value mode="tabs" theme="ara" {labels} {carta} />

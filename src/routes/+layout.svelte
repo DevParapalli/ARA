@@ -22,7 +22,7 @@
             invalidateAll();
         });
 
-        const theme = localStorage.getItem('theme') ?? 'dim';
+        const theme = localStorage.getItem('theme') ?? 'dracula';
         document.documentElement.setAttribute('data-theme', theme);
 
         return () => _s.data.subscription.unsubscribe();
@@ -48,13 +48,13 @@
 <div class="drawer h-full lg:drawer-open">
     <input bind:checked={drawer_open} id="sidebar-drawer" type="checkbox" class="drawer-toggle" />
     <div class="drawer-content flex h-screen w-full flex-col items-center justify-center">
-        <div class="w-full overflow-y-auto">
+        <div class="w-full h-full overflow-y-auto bg-base-300">
             <slot />
         </div>
     </div>
-    <div class="drawer-side">
+    <div class="drawer-side lg:border-r-2 border-base-100">
         <label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
-        <ul class="menu min-h-full w-80 bg-base-200 p-4 text-base-content">
+        <ul class="menu min-h-full w-80 bg-base-300 p-4 text-base-content">
             <!-- Sidebar content here -->
             <li><a href="/">Home</a></li>
             {#if !data.session}
@@ -68,7 +68,10 @@
                     </form>
                 </li>
 
-                <a href="/auth/user_profile" class="mt-auto flex w-full items-center gap-4">
+                
+                
+
+                <a href="/auth/user_profile" class="flex w-full items-center gap-4 mt-auto">
                     <div class="flex items-center justify-center rounded-full bg-slate-800 p-4">
                         <svg xmlns="http://www.w3.org/2000/svg" width="1.5rem" height="1.5rem" viewBox="0 0 1200 1200"
                             ><path

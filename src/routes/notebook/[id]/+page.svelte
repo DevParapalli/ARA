@@ -10,12 +10,15 @@
     import { convert_cells_to_context } from '$lib/utils';
     import { RemoteRunnable } from '@langchain/core/runnables/remote';
     import type { RemoteRunnableResponseChunk } from '$lib/types/langchain';
+    import { AIMessageChunk } from '@langchain/core/messages';
+    import SourceCell from '$lib/components/SourceCell.svelte';
+    import { flip } from 'svelte/animate';
 
     export let data: PageData;
     $: ({ supabase } = data);
 
-    // const remoteChain = new RemoteRunnable({ url: 'http://localhost:4945/rag' });
-    const remoteChain = new RemoteRunnable({ url: 'http://localhost:4945/norag' });
+    const ragChain = new RemoteRunnable({ url: 'http://localhost:4945/rag' });
+    const noragChain = new RemoteRunnable({ url: 'http://localhost:4945/norag' });
 
     let cells: Tables<'cells'>[] = [];
     onMount(() => {
@@ -38,10 +41,10 @@
                 ai_cell_disabled = false;
             }
         });
-        const interval = setInterval(heartbeat, 20000);
-        return () => {
-            clearInterval(interval);
-        };
+        // const interval = setInterval(heartbeat, 20000);
+        // return () => {
+        //     clearInterval(interval);
+        // };
     });
 
     function handleAddCellUser() {
@@ -72,7 +75,6 @@
                 content: '',
                 metadata: {
                     prompt: promptValue,
-                    sources: [],
                 },
             })
             .select()
@@ -84,62 +86,91 @@
                 }
             });
 
+        let cell_index = cells.length - 1;
+
         // let new_cell = { id: 'ABC', notebook: $page.params.id, content: promptValue };
         // cells = [...cells, new_cell];
 
         const modal = document.getElementById('ai_prompt_modal');
-        modal?.close();
+        modal?.close(); // @ts-ignore
 
         let metadata = {};
         let sources = [];
         let response = '';
 
-        (async () => {
-            const result = await remoteChain.stream({ prompt: promptValue, context: convert_cells_to_context(cells) });
-            console.debug('Result', result);
-            for await (const chunk of result) {
-                if (typeof chunk === 'string') {
-                    response += chunk;
-                    continue;
-                }
-                if ('run_id' in (chunk as object) || 'prompt' in (chunk as object) || 'context' in (chunk as object)) {
-                    metadata = Object.assign(metadata, chunk);
-                } else if ('sources' in (chunk as object)) {
-                    sources = chunk as Array<Document>;
-                } else if ('response' in (chunk as object)) {
-                    response += chunk['response'] as string;
-                } else {
-                    other = chunk;
-                    console.debug(chunk);
-                }
+        (async (cell_index) => {
+            console.log('Cell index:', cell_index);
 
-                cells[cells.length - 1].content += response;
+            const result = (await ragChain.stream({
+                prompt: promptValue,
+                context: convert_cells_to_context(cells),
+            })) as AsyncGenerator<AIMessageChunk | Object>;
+            response = '';
+            metadata = {};
+            sources = [];
+            let citations: any[] = [];
+            try {
+                for await (const chunk of result) {
+                    console.debug(chunk)
+                    if (chunk instanceof AIMessageChunk) {
+                        if ((chunk.content as string).startsWith('__citation__')) {
+                            // console.debug('Citation:', chunk);
+                            if (typeof chunk.content === 'string' && chunk.content.length > 13)
+                                // '__citation__:'
+                                citations.push(JSON.parse(chunk.content.slice(13))[0]);
+                        } else if ((chunk.content as string).startsWith('__search_queries__')) {
+                            if (typeof chunk.content === 'string' && chunk.content.length > 19)
+                                // '__search_queries__:'
+                                Object.assign(metadata, { search_metadata: JSON.parse(chunk.content.slice(19))[0] });
+                        } else if ((chunk.content as string).startsWith('__search_results__')) {
+                            if (typeof chunk.content === 'string' && chunk.content.length > 19)
+                                // '__search_results__:'
+                                sources = JSON.parse(chunk.content.slice(19)).documents;
+                                cells[cell_index].sources = sources;
+                            // sources.push(chunk);
+                        } else if ((chunk.content as string).startsWith('__stream_end__')) {
+                            // console.debug('Stream end:', chunk);
+                            if (typeof chunk.content === 'string' && chunk.content.length > 15)
+                                // '__stream_end__:'
+                                Object.assign(metadata, JSON.parse(chunk.content.slice(15)));
+                        } else {
+                            response += chunk.content as string;
+                            cells[cell_index].content += chunk.content as string;
+                        }
+                    } else {
+                        // console.debug(chunk);
+                        Object.assign(metadata, chunk);
+                    }
+                }
+            } catch (error) {
+                console.error('Error during retrieval:', error);
             }
 
-            console.debug(metadata, sources, response);
-
-            cells[cells.length - 1].metadata = metadata;
-            cells[cells.length - 1].metadata.sources = sources;
-            cells[cells.length - 1].content = response;
+            cells[cell_index].metadata = Object.assign(cells[cell_index].metadata || {}, metadata);
+            cells[cell_index].sources = sources;
+            cells[cell_index].content = response;
+            cells[cell_index].citations = citations;
             const { data, error } = await supabase
                 .from('cells')
-                .upsert(cells[cells.length - 1])
+                .upsert(cells[cell_index])
                 .select()
                 .single();
             if (error || !data) {
                 console.error(error);
             } else {
                 console.debug(data);
-                cells[cells.length - 1] = data;
+                cells[cell_index] = data;
             }
-        })();
+            // finally, free the cell
+            ai_cell_disabled = false;
+        })(cell_index + 1);
 
         promptValue = '';
-        ai_cell_disabled = false;
+        
     }
 
     let conn_status = 'Disconnected';
-    let conn_status_flag = 'text-redd-500';
+    let conn_status_flag = 'text-red-500';
 
     async function heartbeat() {
         try {
@@ -161,10 +192,11 @@
     }
 </script>
 
-<div class="relative flex flex-col items-center p-10">
+<div  class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
-        <div class="w-full">
+        <div animate:flip class="flex w-full">
             <div
+                id="cell-container-{cell.id}"
                 on:focusout={(e) => {
                     //@ts-ignore
                     if (e.currentTarget.contains(e.relatedTarget)) {
@@ -187,6 +219,15 @@
                     <div>Cell-level actions.</div>
                 </div>
             </div>
+            {#if cell.type === 'generated' && Array.isArray(cell.sources) && cell.sources.length > 0}
+                <div id="sources-container-{cell.id}" class="w-[30%] overflow-y-scroll p-4">
+                    <div class="flex flex-col gap-y-1">
+                        {#each cell.sources as source}
+                        <SourceCell {source} />
+                        {/each}
+                    </div>
+                </div>
+            {/if}
         </div>
     {:else}
         <div class="flex flex-col items-center p-10 w-full">

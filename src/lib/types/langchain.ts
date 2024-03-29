@@ -9,3 +9,11 @@ export interface RemoteRunnableResponseChunk {
 }
 
 export type RemoteRunnableResponse = RemoteRunnableResponseChunk[];
+
+export interface LCSource {
+    id: string;
+    url: string;
+    title: string;
+    snippet: string;
+    timestamp: string;
+}
