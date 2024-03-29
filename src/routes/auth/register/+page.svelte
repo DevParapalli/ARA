@@ -20,7 +20,11 @@
                 <label class="label-text" for="password">Password</label>
             </div>
             <div class="join">
-                <input class="input join-item font-mono" name="password" type={visible ? 'text' : 'password'} required />
+                <input
+                    class="input join-item font-mono"
+                    name="password"
+                    type={visible ? 'text' : 'password'}
+                    required />
                 <button
                     on:click|preventDefault={() => {
                         visible = !visible;

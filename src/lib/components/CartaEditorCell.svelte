@@ -29,7 +29,6 @@
     };
     export let value = '`This` is [an](url) **_~~example~~_** **inspired** by [GitHub](https://github.com)';
 
-
     onMount(() => {
         // carta.element?.querySelector('.carta-toolbar-left button:last-child')?.click();
         // Hack to make the editor cell, view first

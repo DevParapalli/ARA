@@ -161,13 +161,11 @@
                         // console.debug('Citation:', chunk);
                         if (typeof chunk.content === 'string' && chunk.content.length > 13)
                             citations.push(JSON.parse(chunk.content.slice(13))[0]); // '__citation__:'
-
                     } else if ((chunk.content as string).startsWith('__search_queries__')) {
                         // console.debug('Search Query:', chunk);
                         // sources.push(chunk);
                         if (typeof chunk.content === 'string' && chunk.content.length > 19)
                             console.log(JSON.parse(chunk.content.slice(19))); // '__search_queries__:'
-
                     } else if ((chunk.content as string).startsWith('__search_results__')) {
                         // console.debug('Search Results:', chunk);
                         if (typeof chunk.content === 'string' && chunk.content.length > 19)

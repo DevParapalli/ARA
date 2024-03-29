@@ -111,7 +111,7 @@
             let citations: any[] = [];
             try {
                 for await (const chunk of result) {
-                    console.debug(chunk)
+                    console.debug(chunk);
                     if (chunk instanceof AIMessageChunk) {
                         if ((chunk.content as string).startsWith('__citation__')) {
                             // console.debug('Citation:', chunk);
@@ -126,7 +126,7 @@
                             if (typeof chunk.content === 'string' && chunk.content.length > 19)
                                 // '__search_results__:'
                                 sources = JSON.parse(chunk.content.slice(19)).documents;
-                                cells[cell_index].sources = sources;
+                            cells[cell_index].sources = sources;
                             // sources.push(chunk);
                         } else if ((chunk.content as string).startsWith('__stream_end__')) {
                             // console.debug('Stream end:', chunk);
@@ -150,11 +150,7 @@
             cells[cell_index].sources = sources;
             cells[cell_index].content = response;
             cells[cell_index].citations = citations;
-            const { data, error } = await supabase
-                .from('cells')
-                .upsert(cells[cell_index])
-                .select()
-                .single();
+            const { data, error } = await supabase.from('cells').upsert(cells[cell_index]).select().single();
             if (error || !data) {
                 console.error(error);
             } else {
@@ -166,7 +162,6 @@
         })(cell_index + 1);
 
         promptValue = '';
-        
     }
 
     let conn_status = 'Disconnected';
@@ -192,7 +187,7 @@
     }
 </script>
 
-<div  class="relative flex flex-col items-center p-10">
+<div class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
         <div animate:flip class="flex w-full">
             <div
@@ -223,7 +218,7 @@
                 <div id="sources-container-{cell.id}" class="w-[30%] overflow-y-scroll p-4">
                     <div class="flex flex-col gap-y-1">
                         {#each cell.sources as source}
-                        <SourceCell {source} />
+                            <SourceCell {source} />
                         {/each}
                     </div>
                 </div>
