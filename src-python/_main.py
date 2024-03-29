@@ -9,7 +9,6 @@ from langserve import add_routes
 load_dotenv()
 
 
-
 GROQ_KEY = os.environ.get("GROQ_KEY")
 
 mixtral = ChatGroq(temperature=-0.5, model="mixtral-8x7b-32768", groq_api_key=GROQ_KEY)
