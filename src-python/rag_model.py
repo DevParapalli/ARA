@@ -1,7 +1,7 @@
 from typing import Any, AsyncIterator, Dict, Iterator, List, Optional, Union
 
 import ujson
-from cohere import ChatCitation
+from cohere import ChatCitation, ChatSearchQuery, ChatSearchResult
 from langchain_cohere import ChatCohere
 from langchain_core.callbacks.manager import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
 from langchain_core.messages import AIMessage, BaseMessage, ChatMessage, HumanMessage, SystemMessage
@@ -87,6 +87,34 @@ def convert_citations_to_dict(citations: List[ChatCitation], **kwargs) -> List[D
     ]
 
 
+def convert_search_queries_to_dict(search_queries: List[ChatSearchQuery], **kwargs):
+    if not search_queries:
+        return []
+    return [{"query": search_query.text} for search_query in search_queries]
+
+
+_cohere_document = {
+    "id": "doc-0",  # usually web-search_x
+    "snippet": "This is a snippet of the document.",  # This is the text to be referenced
+    "timestamp": "2022-01-01T00:00:00",  # This is the time the document was search in UTC time
+    "title": "Document Title",  # This is the title of the document
+    "url": "https://example.com",  # This is the URL of the source
+}
+
+
+def convert_chat_search_results_to_dict(search_results: List[ChatSearchResult], **kwargs):
+    if not search_results:
+        return []
+    return [
+        {
+            "connector": search_result.connector.id,
+            # 'documents': search_result.documents if len(search_result.document_ids) > 0 else [], #type:ignore documents is maybe defined, so we check ids for presence
+            "document_ids": search_result.document_ids,
+        }
+        for search_result in search_results
+    ]
+
+
 def serialize(data: Any) -> str:
     return ujson.dumps(data)
 
@@ -120,6 +148,28 @@ class ChatCohereWithMetadata(ChatCohere):
                         content=f"__citation__:{serialize(convert_citations_to_dict(data.citations))}"
                     )
                 )
+                yield chunk
+            if data.event_type == "search-queries-generation":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__search_queries__:{serialize(convert_search_queries_to_dict(data.search_queries))}"
+                    )
+                )
+                yield chunk
+            if data.event_type == "search-results":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__search_results__:{serialize({'documents': data.documents, 'metadata': convert_chat_search_results_to_dict(data.search_results)})}"
+                    )
+                )
+                yield chunk
+            if data.event_type == "stream-end":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__stream_end__:{serialize({'token_count': data.response.token_count, 'metadata': data.response.meta})}"
+                    )
+                )
+                yield chunk
 
     async def _astream(
         self,
@@ -142,23 +192,31 @@ class ChatCohereWithMetadata(ChatCohere):
                 if run_manager:
                     await run_manager.on_llm_new_token(delta, chunk=chunk)
                 yield chunk
+            if data.event_type == "citation-generation":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__citation__:{serialize(convert_citations_to_dict(data.citations))}"
+                    )
+                )
+                yield chunk
+            if data.event_type == "search-queries-generation":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__search_queries__:{serialize(convert_search_queries_to_dict(data.search_queries))}"
+                    )
+                )
+                yield chunk
+            if data.event_type == "search-results":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__search_results__:{serialize({'documents': data.documents, 'metadata': convert_chat_search_results_to_dict(data.search_results)})}"
+                    )
+                )
+                yield chunk
             if data.event_type == "stream-end":
                 chunk = ChatGenerationChunk(
                     message=AIMessageChunk(
-                        response_metadata={
-                            "documents": data.response.documents or [],
-                            "citations": convert_citations_to_dict(data.response.citations),
-                        },
-                        additional_kwargs={
-                            "documents": data.response.documents or [],
-                            "citations": convert_citations_to_dict(data.response.citations),
-                        },
-                        content=ujson.dumps(
-                            {
-                                "documents": data.response.documents or [],
-                                "citations": convert_citations_to_dict(data.response.citations),
-                            }
-                        ),
+                        content=f"__stream_end__:{serialize({'token_count': data.response.token_count, 'metadata': data.response.meta})}"
                     )
                 )
                 yield chunk

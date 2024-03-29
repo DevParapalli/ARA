@@ -5,6 +5,7 @@
     import { page } from '$app/stores';
 
     import { RemoteRunnable } from '@langchain/core/runnables/remote';
+    import { AIMessageChunk } from '@langchain/core/messages';
     import { onMount } from 'svelte';
     import type { SupabaseClient } from '@supabase/supabase-js';
     import type { Database } from '$lib/supabaseTypes';
@@ -146,30 +147,58 @@
         // console.log(response, metadata, sources)
         // isloading = false;
 
-        const result = await remoteChain.stream({ prompt: prompt, context: context });
+        const result = (await remoteChain.stream({ prompt: prompt, context: context })) as AsyncGenerator<
+            AIMessageChunk | Object
+        >;
         response = '';
         metadata = {};
         sources = [];
-        let rag_chunk;
+        let citations: any[] = [];
         try {
             for await (const chunk of result) {
-                console.debug(chunk);
-                response += chunk.content ?? "";
-                if (chunk.response_metadata?.documents)
-                    sources = sources.concat(chunk.response_metadata.documents);
-                // response += JSON.stringify(chunk);
-                if (chunk.response_metadata?)
-                    metadata = Object.assign(metadata, chunk['response_metadata']);
+                if (chunk instanceof AIMessageChunk) {
+                    if ((chunk.content as string).startsWith('__citation__')) {
+                        // console.debug('Citation:', chunk);
+                        if (typeof chunk.content === 'string' && chunk.content.length > 13)
+                            citations.push(JSON.parse(chunk.content.slice(13))[0]); // '__citation__:'
+
+                    } else if ((chunk.content as string).startsWith('__search_queries__')) {
+                        // console.debug('Search Query:', chunk);
+                        // sources.push(chunk);
+                        if (typeof chunk.content === 'string' && chunk.content.length > 19)
+                            console.log(JSON.parse(chunk.content.slice(19))); // '__search_queries__:'
+
+                    } else if ((chunk.content as string).startsWith('__search_results__')) {
+                        // console.debug('Search Results:', chunk);
+                        if (typeof chunk.content === 'string' && chunk.content.length > 19)
+                            sources = JSON.parse(chunk.content.slice(19)).documents; // '__search_results__:'
+                        // sources.push(chunk);
+                    } else if ((chunk.content as string).startsWith('__stream_end__')) {
+                        // console.debug('Stream end:', chunk);
+                        if (typeof chunk.content === 'string' && chunk.content.length > 15)
+                            Object.assign(metadata, JSON.parse(chunk.content.slice(15))); // '__stream_end__:'
+                    } else {
+                        response += chunk.content as string;
+                    }
+                } else {
+                    console.debug(chunk);
+                }
             }
         } catch (error) {
             console.error('Error during retrieval:', error);
-            // debugger;
         }
         // data = result as string
         const { data, error } = await $page.data.supabase
             .from('llm_runs')
-            .upsert({ id: metadata['run_id'], prompt: prompt, context: context, response: response, sources: sources });
-        console.debug(response, metadata, sources);
+            // .upsert({ id: metadata['run_id'], prompt: prompt, context: context, response: response, sources: sources });
+            .upsert({
+                id: `debug-run-${new Date().getTime()}`,
+                prompt: prompt,
+                context: context,
+                response: response,
+                sources: sources,
+            });
+        console.debug(response, metadata, sources, citations);
         // console.log(JSON.parse(result as string))
         isloading = false;
     }
