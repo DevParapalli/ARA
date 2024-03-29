@@ -1,39 +1,29 @@
+import os
 from operator import itemgetter
-from langchain_community.retrievers import (
-    CohereRagRetriever, 
-    ArxivRetriever, 
-    PubMedRetriever, 
-    WikipediaRetriever
-)
-from langchain_core.documents import Document
-from langchain_core.output_parsers import StrOutputParser
-from langchain_core.prompts import ChatPromptTemplate, PromptTemplate
-from langchain.chains.summarize import load_summarize_chain
-from typing import TypedDict, List
-from langchain_core.runnables import (
-    RunnableParallel, 
-    RunnablePassthrough
-)
-from langchain_community.chat_models import ChatCohere
-
-from langchain_groq import ChatGroq
-from langchain_anthropic import ChatAnthropic
 
 from dotenv import load_dotenv
-from pydantic import BaseModel
-load_dotenv()
-import os
-import json
-
-from langserve import add_routes
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from langchain_anthropic import ChatAnthropic
+from langchain_community.chat_models import ChatCohere
+from langchain_community.retrievers import CohereRagRetriever, WikipediaRetriever
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
+from langchain_groq import ChatGroq
+from langserve import add_routes
+from pydantic import BaseModel
+
+load_dotenv()
 
 GROQ_KEY = os.environ.get("GROQ_KEY")
 COHERE_KEY = os.environ.get("COHERE_KEY")
-ANTHROPIC_KEY = os.environ.get('ANTHROPIC_KEY')
+ANTHROPIC_KEY = os.environ.get("ANTHROPIC_KEY")
 
-rag = CohereRagRetriever(llm=ChatCohere(client=None, async_client=None, cohere_api_key=COHERE_KEY), top_k = 3, top_k_results=3)
+rag = CohereRagRetriever(
+    llm=ChatCohere(client=None, async_client=None, cohere_api_key=COHERE_KEY), top_k=3, top_k_results=3
+)
 mixtral = ChatGroq(temperature=0.5, model="mixtral-8x7b-32768", groq_api_key=GROQ_KEY)
 gemma = ChatGroq(temperature=0.5, model="gemma-7b-it", groq_api_key=GROQ_KEY)
 llama2 = ChatGroq(temperature=0.5, model="llama2-70b-4096", groq_api_key=GROQ_KEY)
@@ -56,58 +46,59 @@ You can use the following information to complete the user's prompts if you need
 
 # TODO: Add user's context (provided by user and in db) to the prompt.
 
-prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ('system', system_message),
-        ('human', "{prompt}")
-    ]
-)
+prompt_template = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{prompt}")])
+
 
 def fuse_docs(input):
     results_map = input["sources"]
-    names, docs = zip(
-        *((name, doc) for name, docs in results_map.items() for doc in docs)
-    )
-    return list(zip(names, docs)) 
+    names, docs = zip(*((name, doc) for name, docs in results_map.items() for doc in docs))
+    return list(zip(names, docs))
+
 
 def format_named_docs(named_docs: list[tuple[str, Document]]):
     # print(named_docs[0][1].metadata)
-    return "<documents>" + "\n".join(
-f"""<document>
+    return (
+        "<documents>"
+        + "\n".join(
+            f"""<document>
 <source>{source}</source>
 <id>{doc.metadata.get('id', "--")}</id>
 <title>{doc.metadata.get('title', "--")}</title>
 <document_content>{doc.page_content}</document_content>
-</document>""" 
-for source, doc in named_docs
-    ) + "</documents>"
+</document>"""
+            for source, doc in named_docs
+        )
+        + "</documents>"
+    )
+
 
 def merge(x):
-    return x['context'] + '\n\nPrompt:' +  x['prompt']
+    return x["context"] + "\n\nPrompt:" + x["prompt"]
+
 
 # def merge(x):
 #     # return x['context'] + '\n\nPrompt:' +  x['prompt']
 #     return x['prompt']
 
 
-retrieve_all = itemgetter('prompt') | RunnableParallel(
-    {
-        'www': rag, 
-        'wikipedia': wiki_retriver
-    }
-).with_config(run_name="retrieve_all")
+retrieve_all = itemgetter("prompt") | RunnableParallel({"www": rag, "wikipedia": wiki_retriver}).with_config(
+    run_name="retrieve_all"
+)
 
 unescape_map = {
-    r'\_': '_',
+    r"\_": "_",
     # '\\\n':'\\\\\n',
 }
+
 
 def get_unescape_function(unescape_map):
     def unescape(text):
         for k, v in unescape_map.items():
             text = text.replace(k, v)
         return text
+
     return unescape
+
 
 class Prompt(BaseModel):
     prompt: str
@@ -119,30 +110,23 @@ class Prompt(BaseModel):
 
 answer_chain = (
     {
-    "prompt": itemgetter("prompt"),
-    "sources": lambda x: format_named_docs(x["sources"]),
-    "context": itemgetter("context"),
-}
-| prompt_template
-| claude2
-| StrOutputParser()
-# | get_unescape_function(unescape_map)
+        "prompt": itemgetter("prompt"),
+        "sources": lambda x: format_named_docs(x["sources"]),
+        "context": itemgetter("context"),
+    }
+    | prompt_template
+    | claude2
+    | StrOutputParser()
+    # | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")
 
 chain = (
-    (
-        RunnableParallel(
-            {"prompt": itemgetter("prompt") or "", "sources": retrieve_all, "context":itemgetter("context") or "None"}
-        ).with_config(run_name="add_sources")
-        | RunnablePassthrough.assign(sources=fuse_docs).with_config(
-            run_name="fuse_docs"
-        )
-        | RunnablePassthrough.assign(response=answer_chain).with_config(
-            run_name="add_response"
-        )
-    )
-    .with_config(run_name="chain")
-)
+    RunnableParallel(
+        {"prompt": itemgetter("prompt") or "", "sources": retrieve_all, "context": itemgetter("context") or "None"}
+    ).with_config(run_name="add_sources")
+    | RunnablePassthrough.assign(sources=fuse_docs).with_config(run_name="fuse_docs")
+    | RunnablePassthrough.assign(response=answer_chain).with_config(run_name="add_response")
+).with_config(run_name="chain")
 
 app = FastAPI(
     title="mixtral_groq_cohere-rag",
@@ -156,35 +140,33 @@ app.add_middleware(
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
-    
 )
 
 add_routes(app, chain, path="/rag")
 
 norag_answer_chain = (
     {
-    "prompt": itemgetter("prompt"),
-    "sources": lambda x: "None", # lambda x: format_named_docs(x["sources"]),
-    "context": itemgetter("context"),
-}
-| prompt_template
-| mixtral
-| StrOutputParser()
-# | get_unescape_function(unescape_map)
+        "prompt": itemgetter("prompt"),
+        "sources": lambda x: "None",  # lambda x: format_named_docs(x["sources"]),
+        "context": itemgetter("context"),
+    }
+    | prompt_template
+    | mixtral
+    | StrOutputParser()
+    # | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")
 
-norag_chain = (
-    RunnablePassthrough.assign(response=norag_answer_chain).with_config(
-        run_name="add_response"
-    ) 
-)
+norag_chain = RunnablePassthrough.assign(response=norag_answer_chain).with_config(run_name="add_response")
 
 add_routes(app, norag_chain, path="/norag")
+
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=4945, timeout_keep_alive=3600)

@@ -1,12 +1,13 @@
 from typing import Any, AsyncIterator, Dict, Iterator, List, Optional, Union
 
+import ujson
+from cohere import ChatCitation
+from langchain_cohere import ChatCohere
+from langchain_core.callbacks.manager import AsyncCallbackManagerForLLMRun, CallbackManagerForLLMRun
 from langchain_core.messages import AIMessage, BaseMessage, ChatMessage, HumanMessage, SystemMessage
 from langchain_core.messages.ai import AIMessageChunk
-from langchain_cohere import ChatCohere
-from langchain_core.callbacks.manager import CallbackManagerForLLMRun, AsyncCallbackManagerForLLMRun
 from langchain_core.outputs.chat_generation import ChatGenerationChunk
 
-from cohere import ChatCitation
 
 def get_role(message: BaseMessage) -> str:
     """Get the role of the message.
@@ -28,6 +29,7 @@ def get_role(message: BaseMessage) -> str:
         return "System"
     else:
         raise ValueError(f"Got unknown type {message}")
+
 
 def get_cohere_chat_request(
     messages: List[BaseMessage],
@@ -61,15 +63,11 @@ def get_cohere_chat_request(
 
     # by enabling automatic prompt truncation, the probability of request failure is
     # reduced with minimal impact on response quality
-    prompt_truncation = (
-        "AUTO" if documents is not None or connectors is not None else None
-    )
+    prompt_truncation = "AUTO" if documents is not None or connectors is not None else None
 
     req = {
         "message": messages[-1].content,
-        "chat_history": [
-            {"role": get_role(x), "message": x.content} for x in messages[:-1]
-        ],
+        "chat_history": [{"role": get_role(x), "message": x.content} for x in messages[:-1]],
         "documents": documents,
         "connectors": maybe_connectors,
         "prompt_truncation": prompt_truncation,
@@ -78,19 +76,20 @@ def get_cohere_chat_request(
 
     return {k: v for k, v in req.items() if v is not None}
 
-def convert_citations_to_dict(citations: List[ChatCitation], **kwargs) -> List[Dict[str, Union[str,int,List[str]]]]:
+
+def convert_citations_to_dict(citations: List[ChatCitation], **kwargs) -> List[Dict[str, Union[str, int, List[str]]]]:
     # kwargs_with_defaults = {"by_alias": True, "exclude_unset": True, **kwargs}
     if not citations:
         return []
     return [
-        {
-            'start': citation.start,
-            'end': citation.end,
-            'text': citation.text,
-            'document_ids': citation.document_ids
-        } 
+        {"start": citation.start, "end": citation.end, "text": citation.text, "document_ids": citation.document_ids}
         for citation in citations
-        ]
+    ]
+
+
+def serialize(data: Any) -> str:
+    return ujson.dumps(data)
+
 
 class ChatCohereWithMetadata(ChatCohere):
     def _stream(
@@ -115,9 +114,13 @@ class ChatCohereWithMetadata(ChatCohere):
                 if run_manager:
                     run_manager.on_llm_new_token(delta, chunk=chunk)
                 yield chunk
-            if data.event_type == "stream-end":
-                chunk = ChatGenerationChunk(message=AIMessageChunk(response_metadata={'documents':data.response.documents, 'citations':convert_citations_to_dict(data.response.citations)}, content=""))
-                yield chunk
+            if data.event_type == "citation-generation":
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        content=f"__citation__:{serialize(convert_citations_to_dict(data.citations))}"
+                    )
+                )
+
     async def _astream(
         self,
         messages: List[BaseMessage],
@@ -140,5 +143,31 @@ class ChatCohereWithMetadata(ChatCohere):
                     await run_manager.on_llm_new_token(delta, chunk=chunk)
                 yield chunk
             if data.event_type == "stream-end":
-                chunk = ChatGenerationChunk(message=AIMessageChunk(response_metadata={'documents':data.response.documents, 'citations':convert_citations_to_dict(data.response.citations)}, content=""))
+                chunk = ChatGenerationChunk(
+                    message=AIMessageChunk(
+                        response_metadata={
+                            "documents": data.response.documents or [],
+                            "citations": convert_citations_to_dict(data.response.citations),
+                        },
+                        additional_kwargs={
+                            "documents": data.response.documents or [],
+                            "citations": convert_citations_to_dict(data.response.citations),
+                        },
+                        content=ujson.dumps(
+                            {
+                                "documents": data.response.documents or [],
+                                "citations": convert_citations_to_dict(data.response.citations),
+                            }
+                        ),
+                    )
+                )
                 yield chunk
+
+
+# if data.event_type == "stream-end":
+#     chunk = ChatGenerationChunk(message=AIMessageChunk(response_metadata={'documents':data.response.documents or [], 'citations':convert_citations_to_dict(data.response.citations)},
+#                                                        additional_kwargs= {'documents':data.response.documents or [], 'citations':convert_citations_to_dict(data.response.citations)},
+#                                                        content=json.dumps(
+#                                                            {'documents':data.response.documents or [], 'citations':convert_citations_to_dict(data.response.citations)}
+#                                                        )))
+#     yield chunk

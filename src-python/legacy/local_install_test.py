@@ -1,9 +1,11 @@
-from langchain_community.llms import Ollama
 import asyncio
+
+from langchain_community.llms import Ollama
 
 llm = Ollama(model="mistral")
 
 # print(llm.invoke("What are LLMs? How do they work? Context: AI, ML and NLP. Answer in short."))
+
 
 async def invoke():
     chunks = []
@@ -16,7 +18,7 @@ def main():
     loop = asyncio.get_event_loop()
     loop.run_until_complete(invoke())
     loop.close()
-    
+
 
 if __name__ == "__main__":
     main()

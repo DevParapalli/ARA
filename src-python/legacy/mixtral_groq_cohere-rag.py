@@ -1,31 +1,21 @@
+import json
+import os
 from operator import itemgetter
-from langchain_community.retrievers import (
-    CohereRagRetriever, 
-    ArxivRetriever, 
-    PubMedRetriever, 
-    WikipediaRetriever
-)
+
+from dotenv import load_dotenv
+from fastapi import FastAPI
+from fastapi.middleware.cors import CORSMiddleware
+from langchain_community.chat_models import ChatCohere
+from langchain_community.retrievers import CohereRagRetriever, WikipediaRetriever
 from langchain_core.documents import Document
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.prompts import ChatPromptTemplate
-from typing import TypedDict, List
-from langchain_core.runnables import (
-    RunnableParallel, 
-    RunnablePassthrough
-)
-from langchain_community.chat_models import ChatCohere
-
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from langchain_groq import ChatGroq
-
-from dotenv import load_dotenv
-from pydantic import BaseModel
-load_dotenv()
-import os
-import json
-
 from langserve import add_routes
-from fastapi import FastAPI
-from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
+
+load_dotenv()
 
 GROQ_KEY = os.environ.get("GROQ_KEY")
 COHERE_KEY = os.environ.get("COHERE_KEY")
@@ -52,47 +42,44 @@ You can use the following information to complete the user's prompts if you need
 
 # TODO: Add user's context (provided by user and in db) to the prompt.
 
-prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ('system', system_message),
-        ('human', "{prompt}")
-    ]
-)
+prompt_template = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{prompt}")])
+
 
 def fuse_docs(input):
     results_map = input["sources"]
-    names, docs = zip(
-        *((name, doc) for name, docs in results_map.items() for doc in docs)
-    )
-    return list(zip(names, docs)) 
+    names, docs = zip(*((name, doc) for name, docs in results_map.items() for doc in docs))
+    return list(zip(names, docs))
+
 
 def format_named_docs(named_docs: list[tuple[str, Document]]):
-    return "\n\n".join(
-        f"{source}\n{json.dumps(doc.metadata)}\n\n{doc.page_content}" for source, doc in named_docs
-    )
+    return "\n\n".join(f"{source}\n{json.dumps(doc.metadata)}\n\n{doc.page_content}" for source, doc in named_docs)
+
 
 def merge(x):
-    return x['context'] + '\n\nPrompt:' +  x['prompt']
+    return x["context"] + "\n\nPrompt:" + x["prompt"]
 
 
 retrieve_all = merge | RunnableParallel(
     {
-        'www': rag, 
+        "www": rag,
         # 'wikipedia': wiki_retriver
     }
 ).with_config(run_name="retrieve_all")
 
 unescape_map = {
-    r'\_': '_',
+    r"\_": "_",
     # '\\\n':'\\\\\n',
 }
+
 
 def get_unescape_function(unescape_map):
     def unescape(text):
         for k, v in unescape_map.items():
             text = text.replace(k, v)
         return text
+
     return unescape
+
 
 class Prompt(BaseModel):
     prompt: str
@@ -101,30 +88,23 @@ class Prompt(BaseModel):
 
 answer_chain = (
     {
-    "prompt": itemgetter("prompt"),
-    "sources": lambda x: format_named_docs(x["sources"]),
-    "context": itemgetter("context"),
-}
-| prompt_template
-| chat
-| StrOutputParser()
-| get_unescape_function(unescape_map)
+        "prompt": itemgetter("prompt"),
+        "sources": lambda x: format_named_docs(x["sources"]),
+        "context": itemgetter("context"),
+    }
+    | prompt_template
+    | chat
+    | StrOutputParser()
+    | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")
 
 chain = (
-    (
-        RunnableParallel(
-            {"prompt": itemgetter("prompt") or "", "sources": retrieve_all, "context":itemgetter("context") or "None"}
-        ).with_config(run_name="add_sources")
-        | RunnablePassthrough.assign(sources=fuse_docs).with_config(
-            run_name="fuse_docs"
-        )
-        | RunnablePassthrough.assign(response=answer_chain).with_config(
-            run_name="add_response"
-        )
-    )
-    .with_config(run_name="chain")
-)
+    RunnableParallel(
+        {"prompt": itemgetter("prompt") or "", "sources": retrieve_all, "context": itemgetter("context") or "None"}
+    ).with_config(run_name="add_sources")
+    | RunnablePassthrough.assign(sources=fuse_docs).with_config(run_name="fuse_docs")
+    | RunnablePassthrough.assign(response=answer_chain).with_config(run_name="add_response")
+).with_config(run_name="chain")
 
 app = FastAPI(
     title="mixtral_groq_cohere-rag",
@@ -144,28 +124,27 @@ add_routes(app, chain, path="/rag")
 
 norag_answer_chain = (
     {
-    "prompt": itemgetter("prompt"),
-    "sources": lambda x: "None", # lambda x: format_named_docs(x["sources"]),
-    "context": itemgetter("context"),
-}
-| prompt_template
-| chat
-| StrOutputParser()
-| get_unescape_function(unescape_map)
+        "prompt": itemgetter("prompt"),
+        "sources": lambda x: "None",  # lambda x: format_named_docs(x["sources"]),
+        "context": itemgetter("context"),
+    }
+    | prompt_template
+    | chat
+    | StrOutputParser()
+    | get_unescape_function(unescape_map)
 ).with_config(run_name="answer_chain")
 
-norag_chain = (
-    RunnablePassthrough.assign(response=norag_answer_chain).with_config(
-        run_name="add_response"
-    ) 
-)
+norag_chain = RunnablePassthrough.assign(response=norag_answer_chain).with_config(run_name="add_response")
 
 add_routes(app, norag_chain, path="/norag")
+
 
 @app.get("/")
 def read_root():
     return {"Hello": "World"}
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run(app, host="0.0.0.0", port=4945)

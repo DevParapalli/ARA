@@ -3,18 +3,21 @@ test = """ Here are two Python scripts to convert a binary number to a decimal n
 
 test.strip()
 
+
 def _sanitize_output(text: str):
     import mistletoe
     from mistletoe.block_token import CodeFence
+
     # return re.split(r'```(python|c|cpp|js|javascript|rust)\n', text)
     doc = mistletoe.Document(text)
     for token in doc.children:
         if isinstance(token, CodeFence):
-            yield {'language': token.language, 'code': token.content}
+            yield {"language": token.language, "code": token.content}
     # return mistletoe.HtmlRenderer().render(doc)
+
 
 def get_code_from_text(text: str):
     return list(_sanitize_output(text))
 
-print(get_code_from_text(test))
 
+print(get_code_from_text(test))

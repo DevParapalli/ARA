@@ -1,9 +1,7 @@
 from operator import itemgetter
 
 from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableParallel, RunnablePassthrough
-from langchain_core.output_parsers import StrOutputParser
-
+from langchain_core.runnables import RunnableParallel
 from models import chat_command_r_cohere
 
 system_message = """
@@ -21,23 +19,18 @@ Additional working information from the user:
 </documents>
 """
 
-answer_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ('system', system_message),
-        ('human', "{prompt}")
-    ]
-)
+answer_prompt_template = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{prompt}")])
 
 _ig = itemgetter
+
 
 def print_n_pass(x):
     print(x.dict(), flush=True)
     return x
 
+
 chain = (
-    RunnableParallel(
-        {"prompt": _ig("prompt"), "context": _ig("context")}
-    )
+    RunnableParallel({"prompt": _ig("prompt"), "context": _ig("context")})
     | answer_prompt_template
     | chat_command_r_cohere.bind(connectors=[{"id": "web-search"}])
 )

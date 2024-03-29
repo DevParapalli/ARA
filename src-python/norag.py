@@ -1,10 +1,9 @@
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnableParallel
-from langchain_core.output_parsers import StrOutputParser
-
 from operator import itemgetter
 
-from models import claude_3_haiku,mixtral_groq, chat_command_r_cohere
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.runnables import RunnableParallel
+from models import mixtral_groq
 
 system_message = """
 You are ARA, a intelligent research assistant created by Team ARA of Government College of Engineering, Nagpur.
@@ -21,20 +20,11 @@ Additional working information from the user:
 </documents>
 """
 
-norag_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ('system', system_message),
-        ('human', "{prompt}")
-    ]
-)
+norag_prompt_template = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{prompt}")])
 
 chain = (
     RunnableParallel(
-        {
-            'prompt': itemgetter('prompt'),
-            'sources': lambda x: "None",
-            'context': itemgetter('context')
-        },
+        {"prompt": itemgetter("prompt"), "sources": lambda x: "None", "context": itemgetter("context")},
     )
     | norag_prompt_template
     # | claude_3_haiku

@@ -155,9 +155,11 @@
             for await (const chunk of result) {
                 console.debug(chunk);
                 response += chunk.content ?? "";
-                sources = chunk.response_metadata?.documents ?? [];
+                if (chunk.response_metadata?.documents)
+                    sources = sources.concat(chunk.response_metadata.documents);
                 // response += JSON.stringify(chunk);
-                metadata = chunk['response_metadata'] ?? {};
+                if (chunk.response_metadata?)
+                    metadata = Object.assign(metadata, chunk['response_metadata']);
             }
         } catch (error) {
             console.error('Error during retrieval:', error);

@@ -1,69 +1,40 @@
+import os
 from operator import itemgetter
-from langchain_core.runnables import (
-    RunnableParallel, 
-    RunnablePassthrough
-)
 
-from langchain_core.prompts import (
-    ChatPromptTemplate
-)
-
-from langchain_community.retrievers import (
-    WikipediaRetriever,
-    # CohereRagRetriever
-)
-
-from langchain_cohere import CohereRagRetriever
-
-from langchain_cohere.rerank import (
-    CohereRerank
-)
-
+from dotenv import load_dotenv
 from langchain.retrievers import (
     ContextualCompressionRetriever,
     MergerRetriever,
 )
 
-from langchain_core.output_parsers import (
-    StrOutputParser
+# CohereRagRetriever
+from langchain_cohere import CohereRagRetriever
+from langchain_cohere.rerank import CohereRerank
+from langchain_community.retrievers import (
+    WikipediaRetriever,
 )
-
-from langchain_core.retrievers import (
-    BaseRetriever
-)
-
-from langchain_core.callbacks import  (
-    CallbackManagerForRetrieverRun
-)
-
-from langchain_core.documents import (
-    Document
-)
-
+from langchain_core.callbacks import CallbackManagerForRetrieverRun
+from langchain_core.documents import Document
+from langchain_core.output_parsers import StrOutputParser
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_core.retrievers import BaseRetriever
+from langchain_core.runnables import RunnableParallel, RunnablePassthrough
 from models import (
-    claude_3_haiku, 
-    mixtral_groq, 
-    # command_r_cohere, 
-    chat_command_r_cohere, 
-    chat_cohere
+    chat_cohere,
+    chat_command_r_cohere,
 )
 
-from dotenv import load_dotenv
 load_dotenv()
 
-import os
 
 COHERE_KEY = os.environ.get("COHERE_KEY")
 
 
 cohere_rag = CohereRagRetriever(
-    llm = chat_cohere,
+    llm=chat_cohere,
 )
 
-wikipedia_rag = WikipediaRetriever(
-    wiki_client=None, 
-    top_k_results=2
-)
+wikipedia_rag = WikipediaRetriever(wiki_client=None, top_k_results=2)
 
 lotr = MergerRetriever(
     retrievers=[
@@ -72,46 +43,39 @@ lotr = MergerRetriever(
     ]
 )
 
-compressor = CohereRerank(
-    cohere_api_key=COHERE_KEY,
-    top_n=5
-)
+compressor = CohereRerank(cohere_api_key=COHERE_KEY, top_n=5)
 
-compression_retriever = ContextualCompressionRetriever(
-    base_retriever=lotr,
-    base_compressor=compressor
-)
+compression_retriever = ContextualCompressionRetriever(base_retriever=lotr, base_compressor=compressor)
 
-compression_retriever_chain = (
-    itemgetter('prompt')
-    | compression_retriever
-)
+compression_retriever_chain = itemgetter("prompt") | compression_retriever
+
 
 class ContextRetriever(BaseRetriever):
-    """ This is supposed to be a retriever that returns the notebook cells for a given notebook id using supabase"""
-    
+    """This is supposed to be a retriever that returns the notebook cells for a given notebook id using supabase"""
+
     def _get_relevant_documents(self, query: str, *, run_manager: CallbackManagerForRetrieverRun) -> list[Document]:
-        return [
-            Document(page_content="Custom Document")
-        ]
+        return [Document(page_content="Custom Document")]
+
 
 context_rag = ContextRetriever()
 
-context_rag_chain = (
-    itemgetter('context')
-    | context_rag
-)
+context_rag_chain = itemgetter("context") | context_rag
 
 
 def format_docs(docs: list[Document]):
-    return "<documents>" + "\n".join(
-f"""<document>
+    return (
+        "<documents>"
+        + "\n".join(
+            f"""<document>
 <id>{doc.metadata.get('id', "--")}</id>
 <title>{doc.metadata.get('title', "--")}</title>
 <document_content>{doc.page_content}</document_content>
-</document>""" 
-for doc in docs
-    ) + "</documents>"
+</document>"""
+            for doc in docs
+        )
+        + "</documents>"
+    )
+
 
 def get_formatted_docs_from_chain(input):
     return format_docs(input["sources"])
@@ -135,20 +99,15 @@ Additional working information from the user:
 """
 
 
-answer_prompt_template = ChatPromptTemplate.from_messages(
-    [
-        ('system', system_message),
-        ('human', "{prompt}")
-    ]
-)
+answer_prompt_template = ChatPromptTemplate.from_messages([("system", system_message), ("human", "{prompt}")])
 
 answer_chain = (
     RunnableParallel(
         {
-            'prompt': itemgetter('prompt'),
-            'sources': get_formatted_docs_from_chain,
+            "prompt": itemgetter("prompt"),
+            "sources": get_formatted_docs_from_chain,
             # 'context': context_rag_chain
-            'context': itemgetter('context')
+            "context": itemgetter("context"),
         },
     )
     | answer_prompt_template
@@ -159,15 +118,11 @@ answer_chain = (
 )
 
 
-chain = (
-    RunnableParallel(
-        {
-            'prompt': itemgetter('prompt'),
-            'sources': compression_retriever_chain,
-            # 'context': context_rag_chain
-            'context': itemgetter('context')
-        },
-    )
-    | RunnablePassthrough.assign(response=answer_chain).with_config(run_name="add_response")
-)
-
+chain = RunnableParallel(
+    {
+        "prompt": itemgetter("prompt"),
+        "sources": compression_retriever_chain,
+        # 'context': context_rag_chain
+        "context": itemgetter("context"),
+    },
+) | RunnablePassthrough.assign(response=answer_chain).with_config(run_name="add_response")
