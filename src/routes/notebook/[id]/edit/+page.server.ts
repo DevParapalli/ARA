@@ -1,16 +1,15 @@
 import { Tables } from '$lib/supabaseTypes.js';
-import { fail, redirect } from '@sveltejs/kit';
+import { fail, redirect, error } from '@sveltejs/kit';
 
 export const actions = {
     create: async (event) => {
-        const { request, locals} = event;
+        const { request, locals, params} = event;
         const formData = await request.formData();
 
         const name = formData.get('name');
 
         const notes = formData.get('notes');
 
-        const user_id = formData.get('user_id');
 
         if (typeof name !== 'string' || typeof notes !== 'string') {
             return fail(400, {
@@ -63,40 +62,34 @@ export const actions = {
         }
 
         // Save the notebook to the database
-        const {data: notebook, error} = await locals.supabase.from('notebooks').insert({
+        await locals.supabase.from('notebooks').update({
             name,
             notes,
-            created_by: (await locals.getSession()).user.id,
-        }).select().single().returns<Tables<'notebooks'>>()
+        })
+        .eq('id', params.id)
 
         // console.log(JSON.stringify(notebook))
 
-        if (error) {
-            return fail(500, {
-                error: 'Database Error',
-                name: name,
-                notes: notes,
-                error_on: '',
-                message: error.message,
-            });
-        }
-
-        // create an initial cell in the notebook
-
-        await locals.supabase.from('cells').insert({
-            notebook: notebook.id,
-            content: 'Try editing this cell...',
-            type: 'markdown',
-        })
                 
-        redirect(307, `/notebook/${notebook.id}`);
+        redirect(307, `/notebook/${params.id}`);
     },
 };
 
-export async function load({ locals: { getSession } }) {
+export async function load({ locals: { getSession, supabase }, params }) {
     const session = await getSession();
     // If the user is not logged in redirect back to the home page, for login
     if (!session) {
         redirect(303, '/');
     }
+
+    const {data, error: DBError} = await supabase.from('notebooks').select('*').eq('id', params.id).single();
+
+    if (DBError) {
+        error(500, 'Database Error');
+    }
+
+    return {
+        notebook: data
+    }
+
 }

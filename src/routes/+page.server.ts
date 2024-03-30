@@ -1,4 +1,5 @@
 import { redirect } from '@sveltejs/kit';
+import type { Tables } from '$lib/supabaseTypes.js';
 
 export async function load({ locals: { getSession, supabase } }) {
     const session = await getSession();
@@ -6,8 +7,8 @@ export async function load({ locals: { getSession, supabase } }) {
     if (!session) {
         redirect(303, '/auth/login?next=/');
     }
-
-    const { data, error } = await supabase.from('notebooks').select('id,name,public').eq('created_by', session.user.id);
+    
+    const { data, error } = await supabase.from('notebooks').select('*').eq('created_by', session.user.id).returns<Tables<'notebooks'>[]>();
 
     if (error) {
         console.error(error);

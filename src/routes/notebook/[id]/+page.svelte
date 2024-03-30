@@ -99,7 +99,7 @@
         let response = '';
 
         (async (cell_index) => {
-            console.log('Cell index:', cell_index);
+            // console.log('Cell index:', cell_index);
 
             const result = (await ragChain.stream({
                 prompt: promptValue,
@@ -189,7 +189,7 @@
 
 <div class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
-        <div animate:flip class="flex w-full">
+        <div animate:flip class="flex lg:flex-row flex-col w-full">
             <div
                 id="cell-container-{cell.id}"
                 on:focusout={(e) => {
@@ -215,8 +215,9 @@
                 </div>
             </div>
             {#if cell.type === 'generated' && Array.isArray(cell.sources) && cell.sources.length > 0}
-                <div id="sources-container-{cell.id}" class="w-[30%] overflow-y-scroll p-4">
-                    <div class="flex flex-col gap-y-1">
+                <div id="sources-container-{cell.id}" class="lg:w-[30%] mx-auto overflow-y-auto p-4">
+                    <span class="lg:hidden">Sources:</span>
+                    <div class="flex flex-col gap-y-1 items-center">
                         {#each cell.sources as source}
                             <SourceCell {source} />
                         {/each}

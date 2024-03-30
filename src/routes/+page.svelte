@@ -1,7 +1,13 @@
-<script>
-    export let data;
+<script lang="ts">
+    import type { PageData } from "./$types";
 
-    $: ({ supabase } = data);
+    import NotebookHomeComponent from "$lib/components/NotebookHomeComponent.svelte";
+    import { invalidate } from "$app/navigation";
+
+
+    export let data: PageData;
+
+    // $: ({ supabase, data: notebooks } = data);
 </script>
 
 <!-- <div class="w-full flex-col items-center gap-4 p-10">
@@ -43,5 +49,14 @@
                     placeholder="Search" />
             </label>
         </div>
+    </div>
+
+    <div class="flex flex-wrap justify-center lg:justify-normal lg:items-start gap-4 p-10">
+        {#if data.data}
+            {#each data.data as notebook}
+                <NotebookHomeComponent {notebook} />
+            {/each}
+        {/if}
+        <!-- <button on:click={() => {invalidate('')}}>INVALID</button> -->
     </div>
 </div>

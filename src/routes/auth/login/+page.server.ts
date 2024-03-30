@@ -23,6 +23,7 @@ export const actions = {
                 });
             }
             return fail(500, {
+                invalid: true,
                 message: 'Server error. Try again later.',
             });
         }

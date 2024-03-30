@@ -5,26 +5,43 @@
     export let form;
     export let data: PageData;
 
+    if (form == null) {
+        
+        let note = ''
+        if (typeof data?.notebook?.notes === 'object' && data?.notebook?.notes !== null && 'field' in data?.notebook?.notes) {
+            note = data?.notebook?.notes.field
+        } else if (data?.notebook?.notes !== null) {
+            note = data?.notebook?.notes
+        }
+        form = {
+            name: data?.notebook?.name,
+            notes: note,
+            error: '',
+            message: '',
+            error_on: ''
+        }
+
+        console.log(form)
+    }
+
     $: ({supabase, session} = data)
+
 </script>
 
 <div class="flex h-full w-full items-center justify-center">
     <div class="mx-auto my-auto flex w-full max-w-md flex-col items-center rounded-lg bg-base-200 p-4">
-        <h2 class="mr-auto text-3xl">Create a new notebook</h2>
+        <h2 class="mr-auto text-3xl">Edit notebook</h2>
         <hr class="mb-4 mt-4 w-full border-base-100" />
-        <form action="?/create" method="POST" use:enhance class="form-control items-start gap-2">
+        <form action="?/edit" method="POST" use:enhance class="form-control items-start gap-2">
             {#if form?.error }
                 <div transition:fade class="flex w-full justify-center rounded-sm bg-error py-1 text-error-content">
                     <span>{form?.message}</span>
                 </div>{/if}
-            <div class="text-sm text-justify">
-                Each notebook is used as its own source, and used for inference. <span class="font-bold">DO NOT</span> mix different topics in the same notebook.
-                <ul class="text-sm">
-                    <li class="list-item">- Name should be greater than 5 characters, and less than 128 characters.</li>
-                    <li class="list-item">- Notes field is optional.</li>
-                    <li class="list-item">- Notes should be less than 1024 characters.</li>
-                </ul>
-            </div>
+            <ul class="text-sm">
+                <li class="list-item">- Name should be greater than 5 characters, and less than 128 characters.</li>
+                <li class="list-item">- Notes field is optional.</li>
+                <li class="list-item">- Notes should be less than 1024 characters.</li>
+            </ul>
             <hr class="w-full border-base-100 my-2">
             <div class="label">
                 <label class="label-text" for="name">Name</label>
@@ -36,6 +53,7 @@
             
                 <input
                     class="input {form?.error_on == 'notes' ? 'input-error':''} w-full font-mono"
+                    value={form?.notes ?? ''}
                     name="notes"
                     type='text' />
             
