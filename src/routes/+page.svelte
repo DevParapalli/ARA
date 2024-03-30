@@ -3,11 +3,13 @@
 
     import NotebookHomeComponent from "$lib/components/NotebookHomeComponent.svelte";
     import { invalidate } from "$app/navigation";
+    import { flip } from "svelte/animate";
+    import { fade } from "svelte/transition";
 
 
     export let data: PageData;
 
-    // $: ({ supabase, data: notebooks } = data);
+    $: ({ supabase, data: notebooks } = data);
 </script>
 
 <!-- <div class="w-full flex-col items-center gap-4 p-10">
@@ -53,8 +55,10 @@
 
     <div class="flex flex-wrap justify-center lg:justify-normal lg:items-start gap-4 p-10">
         {#if data.data}
-            {#each data.data as notebook}
-                <NotebookHomeComponent {notebook} />
+            {#each data.data as notebook, i (notebook.id)}
+                <div transition:fade class="contents">
+                    <NotebookHomeComponent {notebook} {supabase} />
+                </div>
             {/each}
         {/if}
         <!-- <button on:click={() => {invalidate('')}}>INVALID</button> -->

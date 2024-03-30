@@ -1,9 +1,10 @@
 <script lang="ts">
-    import type {Tables} from '$lib/supabaseTypes'
+    import { invalidate, invalidateAll } from '$app/navigation';
+import type {Database, Tables} from '$lib/supabaseTypes'
     import {getRelativeTime} from '$lib/utils'
+    import type { SupabaseClient } from '@supabase/supabase-js';
     export let notebook: Tables<'notebooks'>;
-
-    
+    export let supabase: SupabaseClient<Database>;
 </script>
 
 <a href={`/notebook/${notebook.id}`} class="aspect-[9/16] w-64 rounded-box p-4 border-2 border-base-content/25 hover:border-base-content/60 bg-base-200 hover:bg-base-100 transition-colors ">
@@ -29,8 +30,18 @@
                 </ul>
             </details> -->
 
-            <a href={`/notebook/${notebook.id}/edit`} class="btn btn-xs btn-outline">Edit</a>
-            <button on:click|preventDefault|stopPropagation={() => {}} class="btn btn-xs btn-outline mr-auto">Delete</button>
+            <a href={`/notebook/${notebook.id}/edit`} class="btn btn-xs btn-outline btn-accent">Edit</a>
+            <button on:click|preventDefault|stopPropagation={async () => {
+                if (confirm(`Are you sure you want to delete ${notebook.name}?`)) {
+                    const {data, error} = await supabase.from('notebooks').delete().eq('id', notebook.id)
+                    
+                    if (error) {
+                        
+                    }
+
+                    await invalidateAll();
+                    // console.log(await supabase.from('notebooks').delete().eq('id', notebook.id
+            }}} class="btn btn-xs btn-outline btn-error mr-auto">Delete</button>
 
             <span class="text-xs">created {getRelativeTime(new Date(notebook.created_at))}</span>
         </div>

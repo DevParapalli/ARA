@@ -25,11 +25,11 @@
         "@typescript-eslint/eslint-plugin": "^6.21.0",
         "@typescript-eslint/parser": "^6.21.0",
         "autoprefixer": "^10.4.17",
-        "parallelshell": "^3.0.2",
         "daisyui": "^4.7.2",
         "eslint": "^8.56.0",
         "eslint-config-prettier": "^9.1.0",
         "eslint-plugin-svelte": "^2.35.1",
+        "parallelshell": "^3.0.2",
         "postcss": "^8.4.35",
         "postcss-load-config": "^5.0.3",
         "prettier": "^3.2.5",
@@ -65,6 +65,7 @@
         "rehype-highlight": "^7.0.0",
         "rehype-mathjax": "^6.0.0",
         "remark-math": "^6.0.0",
-        "svelte-exmarkdown": "^3.0.3"
+        "svelte-exmarkdown": "^3.0.3",
+        "svelte-french-toast": "^1.2.0"
     }
 }

@@ -3,7 +3,7 @@
     import { enhance } from '$app/forms';
     import { invalidate, invalidateAll, goto, beforeNavigate } from '$app/navigation';
     import { onMount } from 'svelte';
-
+    import toast, {Toaster} from 'svelte-french-toast';
     export let data;
 
     $: ({ supabase } = data);
@@ -24,7 +24,7 @@
 
         const theme = localStorage.getItem('theme') ?? 'dracula';
         document.documentElement.setAttribute('data-theme', theme);
-
+        toast('Welcome to the app!', {icon: '👏'});
         return () => _s.data.subscription.unsubscribe();
     });
 
@@ -85,6 +85,9 @@
 
 <label for="sidebar-drawer" class="btn btn-primary drawer-button absolute bottom-0 right-0 mb-6 mr-6 lg:hidden"
     >MENU</label>
+
+
+<Toaster />
 
 <style>
     form {
