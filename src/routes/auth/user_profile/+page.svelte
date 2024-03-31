@@ -48,6 +48,10 @@
     ];
 </script>
 
+<svelte:head>
+    <title>User Profile | Project ARA</title>
+</svelte:head>
+
 <div class="flex h-full w-full items-center justify-center">
     <div class="mx-auto my-auto flex w-full max-w-7xl flex-col items-center gap-y-12 rounded-box bg-base-200 p-8">
         <h2 class="text-3xl">Settings</h2>

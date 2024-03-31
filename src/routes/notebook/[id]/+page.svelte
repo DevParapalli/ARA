@@ -209,6 +209,10 @@
     let deleting_cell = false;
 </script>
 
+<svelte:head>
+    <title>Notebook {$page.params.id} | Project ARA</title>
+</svelte:head>
+
 <div class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
         <div animate:flip class="flex w-full flex-col lg:flex-row">

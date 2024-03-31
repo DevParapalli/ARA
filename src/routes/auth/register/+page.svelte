@@ -5,6 +5,10 @@
     let visible = false;
 </script>
 
+<svelte:head>
+    <title>Register | Project ARA</title>
+</svelte:head>
+
 <div class="flex h-full w-full items-center justify-center">
     <div class="m-auto flex w-full max-w-md flex-col items-center gap-y-12 rounded-lg bg-base-200 p-8">
         <h2 class="text-4xl">Register</h2>

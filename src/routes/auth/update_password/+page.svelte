@@ -6,6 +6,10 @@
     let visible = false;
 </script>
 
+<svelte:head>
+    <title>Update Password | Project ARA</title>
+</svelte:head>
+
 <div class="m-auto flex w-full max-w-md flex-col items-center gap-y-12 rounded-lg bg-base-300 p-8">
     <h2 class="text-4xl">Reset Password</h2>
     <form action="?/update_password" method="POST" class="form-control items-start gap-2" use:enhance>

@@ -4,6 +4,10 @@
     export let form;
 </script>
 
+<svelte:head>
+    <title>Reset Password | Project ARA</title>
+</svelte:head>
+
 <div class="m-auto flex w-full max-w-md flex-col items-center gap-y-2 rounded-lg bg-base-300 p-8">
     <h2 class="text-4xl">Password Reset</h2>
     <form action="?/reset_password" method="POST" class="form-control items-start gap-2" use:enhance>

@@ -11,6 +11,9 @@
     $: ({ supabase, data: notebooks } = data);
 </script>
 
+<svelte:head>
+    <title>Dashboard | Project ARA</title>
+</svelte:head>
 <!-- <div class="w-full flex-col items-center gap-4 p-10">
     <h1 class="text-6xl">Notebooks</h1>
 

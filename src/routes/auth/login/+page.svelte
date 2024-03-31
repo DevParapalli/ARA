@@ -6,6 +6,10 @@
     let visible = false;
 </script>
 
+<svelte:head>
+    <title>Login | Project ARA</title>
+</svelte:head>
+
 <div class="flex h-full w-full items-center justify-center">
     <div class="mx-auto my-auto flex w-full max-w-md flex-col items-center gap-y-12 rounded-lg bg-base-200 p-8">
         <h2 class="text-3xl">Log in</h2>
@@ -18,7 +22,7 @@
             <div class="label">
                 <label class="label-text" for="email">Email</label>
             </div>
-            <input class="input w-full font-mono" name="email" type="email" value={form?.email ?? ''} required />
+            <input class="input w-full font-mono" autocomplete="email" name="email" type="email" value={form?.email ?? ''} required />
             <div class="label">
                 <label class="label-text" for="password">Password</label>
             </div>
@@ -26,6 +30,7 @@
                 <input
                     class="input join-item font-mono"
                     name="password"
+                    autocomplete="current-password"
                     type={visible ? 'text' : 'password'}
                     required />
                 <button

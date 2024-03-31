@@ -8,6 +8,10 @@
     $: ({ supabase, session } = data);
 </script>
 
+<svelte:head>
+    <title>Create New Notebook | Project ARA</title>
+</svelte:head>
+
 <div class="flex h-full w-full items-center justify-center">
     <div class="mx-auto my-auto flex w-full max-w-md flex-col items-center rounded-lg bg-base-200 p-4">
         <h2 class="mr-auto text-3xl">Create a new notebook</h2>
