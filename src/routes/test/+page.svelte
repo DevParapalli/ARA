@@ -55,7 +55,15 @@
     // I hope this helps! Let me know if you have any questions.
     // `;
 
-    let response = 'Use the input below to enter your query.';
+    let response = `dev 123 abc
+
+\`\`\`py
+abc = 32 + 41
+# this is a comment
+if name == 'Dev':
+	ABCD
+	pass
+\`\`\``;
     let metadata = {};
     let prompt: string = '';
     let status = '';
@@ -86,18 +94,18 @@
     async function test_localhost_interval() {
         isloading = true;
         // console.log($page.data.supabase)
-        status = 'Connecting to localhost-server...';
+        status = 'Connecting to ara-api-server...';
         status_flag = 'text-warning';
         try {
             const res = await fetch('https://ara-api.parapalli.dev');
             // const _data = await res.json()
             // data = JSON.stringify(_data)
             isloading = false;
-            status = 'Connected to localhost-server';
+            status = 'Connected to ara-api-server';
             status_flag = 'text-success';
             return true;
         } catch (e) {
-            status = 'Failed to connect to localhost-server';
+            status = 'Failed to connect to ara-api-server';
             status_flag = 'text-error';
             // setTimeout(test_localhost_interval, interval)
             // interval += 1000

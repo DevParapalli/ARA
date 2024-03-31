@@ -5,7 +5,7 @@
     import { slash } from '@cartamd/plugin-slash';
     import { code } from '@cartamd/plugin-code';
     import { math } from '@cartamd/plugin-math';
-    import 'carta-md/dark.css';
+    // import 'carta-md/dark.css';
     import DOMPurify from 'isomorphic-dompurify';
     import { onMount } from 'svelte';
 

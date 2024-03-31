@@ -1,4 +1,5 @@
 <script lang="ts">
+    import CartaViewerCell from '$lib/components/CartaViewerCell.svelte';
     import { errorToast, infoToast, successToast } from '$lib/toast';
     import { onMount } from 'svelte';
 
@@ -13,39 +14,39 @@
     });
 
     const themes = [
-        // 'light',
-        'dark',
-        // 'cupcake',
-        // 'bumblebee',
-        // 'emerald',
-        // 'corporate',
-        'synthwave',
-        // 'retro',
-        // 'cyberpunk',
-        // 'valentine',
-        'halloween',
-        // 'garden',
-        'forest',
-        'aqua',
-        // 'lofi',
-        // 'pastel',
-        // 'fantasy',
-        // 'wireframe',
-        'black',
-        'luxury',
-        'dracula',
-        // 'cmyk',
-        // 'autumn',
-        'business',
-        // 'acid',
-        // 'lemonade',
-        'night',
-        'coffee',
-        // 'winter',
-        'dim',
-        // 'nord',
-        'sunset',
-    ];
+            'light',
+            'dark',
+            'cupcake',
+            // 'bumblebee',
+            'emerald',
+            'corporate',
+            'synthwave',
+            // 'retro',
+            // 'cyberpunk',
+            // 'valentine',
+            'halloween',
+            'garden',
+            'forest',
+            'aqua',
+            // 'lofi',
+            // 'pastel',
+            'fantasy',
+            // 'wireframe',
+            // 'black',
+            // 'luxury',
+            'dracula',
+            'cmyk',
+            'autumn',
+            'business',
+            // 'acid',
+            // 'lemonade',
+            'night',
+            'coffee',
+            'winter',
+            'dim',
+            'nord',
+            'sunset',
+        ];
 </script>
 
 <svelte:head>
@@ -53,9 +54,12 @@
 </svelte:head>
 
 <div class="flex h-full w-full items-center justify-center">
-    <div class="mx-auto my-auto flex w-full max-w-7xl flex-col items-center gap-y-12 rounded-box bg-base-200 p-8">
+    <div class="mx-auto my-auto flex w-full flex-col items-center gap-y-12 rounded-box bg-base-200 p-8">
         <h2 class="text-3xl">Settings</h2>
         <div class="data-container">
+            <div class="flex items-center justify-center w-full">
+                <CartaViewerCell />
+            </div>
             <div class="flex w-full flex-row items-center gap-2">
                 <div class="font-bold">Theme</div>
                 <div class="contents">

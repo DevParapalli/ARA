@@ -224,6 +224,19 @@ body {
     font-display: swap;
 }
 
+@font-face {
+    font-family: 'Dune Rise';
+    src: url('/fonts/Dune_Rise.woff2') format('woff2'),
+        url('/fonts/Dune_Rise.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+    font-display: swap;
+}
+
+.font-dune {
+    font-family: 'Dune Rise', sans-serif;
+}
+
 pre * {
     font-family: 'Fira Code', monospace;
 }
@@ -365,6 +378,10 @@ pre * {
     @apply prose max-w-full;
 }
 
+.markdown-body pre {
+    background-color: oklch(var(--b3));
+}
+
 .carta-input-wrapper textarea {
     @apply min-h-fit focus:border-transparent focus:outline-none focus:ring-0 focus:ring-blue-500;
 }
@@ -400,8 +417,10 @@ textarea#md {
     margin: 10px 0;
     border-radius: 10px;
     padding: 30px 20px;
-    background: white;
-    color: #112;
+
+    background: oklch(var(--b3));
+    color: oklch(var(--bc));
+
     box-shadow: 0 0 5px #0001;
     text-shadow: none;
     font-family: 'Fira Code', monospace;
@@ -436,8 +455,7 @@ textarea#md {
 .shj-numbers div {
     padding-right: 5px;
 }
-.shj-numbers div:before {
-    color: #999;
+.shj-numbers div::before {
     display: block;
     content: counter(line);
     opacity: 0.5;
@@ -448,37 +466,7 @@ textarea#md {
 .shj-syn-cmnt {
     font-style: italic;
 }
-.shj-syn-err,
-.shj-syn-kwd {
-    color: #e16;
-}
-.shj-syn-num,
-.shj-syn-class {
-    color: #f60;
-}
-.shj-numbers,
-.shj-syn-cmnt {
-    color: #999;
-}
-.shj-syn-insert,
-.shj-syn-str {
-    color: #7d8;
-}
-.shj-syn-bool {
-    color: #3bf;
-}
-.shj-syn-type,
-.shj-syn-oper {
-    color: #5af;
-}
-.shj-syn-section,
-.shj-syn-func {
-    color: #84f;
-}
-.shj-syn-deleted,
-.shj-syn-var {
-    color: #f44;
-}
+
 .shj-oneline {
     padding: 12px 10px;
 }
@@ -488,41 +476,45 @@ textarea#md {
     padding: 5px 7px;
     border-radius: 5px;
 }
+
 [class*='shj-lang-'] {
-    color: #c9d1d9;
-    background: #161b22;
+	color: oklch(var(--bc));
+	background: olkch(var(--b3));
 }
-[class*='shj-lang-']:before {
-    color: #6f9aff;
+[class*='shj-lang-']::before {
+	color: #6f9aff;
 }
-.shj-syn-insert {
-    color: #98c379;
-}
+
 .shj-syn-deleted,
 .shj-syn-err,
+.shj-syn-var {
+	color: oklch(var(--er));
+}
+.shj-syn-section,
 .shj-syn-kwd {
-    color: #ff7b72;
+	color: oklch(var(--p));
 }
 .shj-syn-class {
-    color: #ffa657;
+	color: oklch(var(--in));
 }
 .shj-numbers,
 .shj-syn-cmnt {
-    color: #8b949e;
+	color: oklch(var(--nc) / 0.5);
 }
+.shj-syn-insert,
 .shj-syn-type,
-.shj-syn-oper,
-.shj-syn-num,
-.shj-syn-section,
-.shj-syn-var,
+.shj-syn-func,
 .shj-syn-bool {
-    color: #79c0ff;
+	color: oklch(var(--su));
+}
+.shj-syn-num {
+	color: oklch(var(--a));
+}
+.shj-syn-oper {
+	color: oklch(var(--s));
 }
 .shj-syn-str {
-    color: #a5d6ff;
-}
-.shj-syn-func {
-    color: #d2a8ff;
+	color: oklch(var(--a));
 }
 
 .carta-editor:focus-within ~ .cell-actions {
