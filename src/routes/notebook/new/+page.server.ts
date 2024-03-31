@@ -3,7 +3,7 @@ import { fail, redirect } from '@sveltejs/kit';
 
 export const actions = {
     create: async (event) => {
-        const { request, locals} = event;
+        const { request, locals } = event;
         const formData = await request.formData();
 
         const name = formData.get('name');
@@ -63,11 +63,16 @@ export const actions = {
         }
 
         // Save the notebook to the database
-        const {data: notebook, error} = await locals.supabase.from('notebooks').insert({
-            name,
-            notes,
-            created_by: (await locals.getSession()).user.id,
-        }).select().single().returns<Tables<'notebooks'>>()
+        const { data: notebook, error } = await locals.supabase
+            .from('notebooks')
+            .insert({
+                name,
+                notes,
+                created_by: (await locals.getSession()).user.id,
+            })
+            .select()
+            .single()
+            .returns<Tables<'notebooks'>>();
 
         // console.log(JSON.stringify(notebook))
 
@@ -87,8 +92,8 @@ export const actions = {
             notebook: notebook.id,
             content: 'Try editing this cell...',
             type: 'markdown',
-        })
-                
+        });
+
         redirect(307, `/notebook/${notebook.id}`);
     },
 };

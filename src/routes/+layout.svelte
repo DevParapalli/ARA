@@ -1,12 +1,15 @@
-<script>
+<script lang="ts">
     import '../app.pcss';
     import { enhance } from '$app/forms';
     import { invalidate, invalidateAll, goto, beforeNavigate } from '$app/navigation';
     import { onMount } from 'svelte';
-    import toast, {Toaster} from 'svelte-french-toast';
+    import toast, { Toaster } from 'svelte-french-toast';
+    import { infoToast, normalToast, successToast } from '$lib/toast';
     export let data;
 
     $: ({ supabase } = data);
+
+    let user_id: string;
 
     onMount(async () => {
         const _s = await supabase.auth.onAuthStateChange((event, _session) => {
@@ -18,13 +21,44 @@
             //that should be accesible only for logged in user.
             // Otherwise use invalidateAll()
             // which will rerun every load function of you app.
+            if (event == 'SIGNED_OUT') {
+                infoToast('Deauthenticated');
+            } else if (event == 'SIGNED_IN') {
+                successToast('Authenticated');
+            } else if (event == 'INITIAL_SESSION') {
+                infoToast('Found existing session');
+                if (_session) {
+                    successToast('Authenticated');
+                }
+            }
+
+            user_id = _session?.user.id ?? '';
+            supabase
+                .from('users')
+                .select('theme')
+                .eq('id', user_id)
+                .single()
+                .then(({ data, error }) => {
+                    if (error) {
+                        console.error(error);
+                    } else {
+                        localStorage.setItem('theme', data.theme || '');
+                        // console.log('theme', data);
+                        document.documentElement.setAttribute('data-theme', data.theme || '');
+                    }
+                });
             invalidate('supabase:auth');
             invalidateAll();
         });
 
-        const theme = localStorage.getItem('theme') ?? 'dracula';
-        document.documentElement.setAttribute('data-theme', theme);
-        toast('Welcome to the app!', {icon: '👏'});
+        const localTheme = localStorage.getItem('theme') || 'luxury';
+        if (localTheme) {
+            console.log('localTheme', localTheme);
+            document.documentElement.setAttribute('data-theme', localTheme);
+        }
+
+        normalToast('Welcome to the app!', { icon: '👏' });
+
         return () => _s.data.subscription.unsubscribe();
     });
 
@@ -61,7 +95,7 @@
                 <li><a href="/auth/login">login</a></li>
                 <li><a href="/auth/register">Register</a></li>
             {:else}
-                <li><a href="/auth/user_profile">User Profile</a></li>
+                <!-- <li><a href="/auth/user_profile">User Profile</a></li> -->
                 <li class="text-error">
                     <form action="/auth/logout?/logout" method="POST" use:enhance={submitLogout}>
                         <button type="submit">Logout &gt;</button>
@@ -77,6 +111,11 @@
                     </div>
                     <div class="text-sm">{data.session.user.email}</div>
                 </a>
+                <li class="btn btn-error btn-sm px-1 mt-4">
+                    <form action="/auth/logout?/logout" method="POST" use:enhance={submitLogout}>
+                        <button type="submit">Logout &gt;</button>
+                    </form>
+                </li>
                 <!-- TODO: Update Links -->
             {/if}
         </ul>
@@ -85,7 +124,6 @@
 
 <label for="sidebar-drawer" class="btn btn-primary drawer-button absolute bottom-0 right-0 mb-6 mr-6 lg:hidden"
     >MENU</label>
-
 
 <Toaster />
 

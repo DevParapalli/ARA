@@ -7,8 +7,12 @@ export async function load({ locals: { getSession, supabase } }) {
     if (!session) {
         redirect(303, '/auth/login?next=/');
     }
-    
-    const { data, error } = await supabase.from('notebooks').select('*').eq('created_by', session.user.id).returns<Tables<'notebooks'>[]>();
+
+    const { data, error } = await supabase
+        .from('notebooks')
+        .select('*')
+        .eq('created_by', session.user.id)
+        .returns<Tables<'notebooks'>[]>();
 
     if (error) {
         console.error(error);

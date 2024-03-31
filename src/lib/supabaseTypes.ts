@@ -147,6 +147,41 @@ export type Database = {
                     },
                 ];
             };
+            users: {
+                Row: {
+                    custom_data: Json | null;
+                    custom_instructions: string | null;
+                    full_name: string | null;
+                    id: string;
+                    nickname: string | null;
+                    theme: string | null;
+                };
+                Insert: {
+                    custom_data?: Json | null;
+                    custom_instructions?: string | null;
+                    full_name?: string | null;
+                    id: string;
+                    nickname?: string | null;
+                    theme?: string | null;
+                };
+                Update: {
+                    custom_data?: Json | null;
+                    custom_instructions?: string | null;
+                    full_name?: string | null;
+                    id?: string;
+                    nickname?: string | null;
+                    theme?: string | null;
+                };
+                Relationships: [
+                    {
+                        foreignKeyName: 'public_users_id_fkey';
+                        columns: ['id'];
+                        isOneToOne: true;
+                        referencedRelation: 'users';
+                        referencedColumns: ['id'];
+                    },
+                ];
+            };
         };
         Views: {
             [_ in never]: never;

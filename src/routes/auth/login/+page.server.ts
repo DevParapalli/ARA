@@ -27,7 +27,6 @@ export const actions = {
                 message: 'Server error. Try again later.',
             });
         }
-
         redirect(307, '/');
     },
 };

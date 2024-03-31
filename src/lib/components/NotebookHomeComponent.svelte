@@ -1,26 +1,30 @@
 <script lang="ts">
     import { invalidate, invalidateAll } from '$app/navigation';
-import type {Database, Tables} from '$lib/supabaseTypes'
-    import {getRelativeTime} from '$lib/utils'
+    import type { Database, Tables } from '$lib/supabaseTypes';
+    import { errorToast } from '$lib/toast';
+    import { getRelativeTime } from '$lib/utils';
     import type { SupabaseClient } from '@supabase/supabase-js';
+    import toast from 'svelte-french-toast';
     export let notebook: Tables<'notebooks'>;
     export let supabase: SupabaseClient<Database>;
 </script>
 
-<a href={`/notebook/${notebook.id}`} class="aspect-[9/16] w-64 rounded-box p-4 border-2 border-base-content/25 hover:border-base-content/60 bg-base-200 hover:bg-base-100 transition-colors ">
-    <div class="flex flex-col h-full gap-2">
+<a
+    href={`/notebook/${notebook.id}`}
+    class="aspect-[9/16] w-64 rounded-box border-2 border-base-content/25 bg-base-200 p-4 transition-colors hover:border-base-content/60 hover:bg-base-100">
+    <div class="flex h-full flex-col gap-2">
         <div class="inline-flex items-center justify-between">
-            <h2 class="text-2xl line-clamp-1">{notebook.name}</h2>
-            <span class="badge badge-warning px-1 py-2 ">Public</span>
+            <h2 class="line-clamp-1 text-2xl">{notebook.name}</h2>
+            <span class="badge badge-warning px-1 py-2">Public</span>
         </div>
-        <hr class="w-full border-base-100 my-2">
+        <hr class="my-2 w-full border-base-100" />
         {#if typeof notebook.notes === 'object' && notebook.notes !== null && 'field' in notebook.notes}
-             <p class="line-clamp-2">{notebook.notes.field}</p>
+            <p class="line-clamp-2">{notebook.notes.field}</p>
         {:else if notebook.notes !== null}
             <p class="line-clamp-2">{notebook.notes}</p>
         {/if}
-        <hr class="w-full border-base-100 my-2">
-        <div class="flex flex-row items-center justify-between gap-2 mt-auto">
+        <hr class="my-2 w-full border-base-100" />
+        <div class="mt-auto flex flex-row items-center justify-between gap-2">
             <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- <details on:click|stopPropagation={() => {}} class="dropdown dropdown-top">
@@ -30,18 +34,20 @@ import type {Database, Tables} from '$lib/supabaseTypes'
                 </ul>
             </details> -->
 
-            <a href={`/notebook/${notebook.id}/edit`} class="btn btn-xs btn-outline btn-accent">Edit</a>
-            <button on:click|preventDefault|stopPropagation={async () => {
-                if (confirm(`Are you sure you want to delete ${notebook.name}?`)) {
-                    const {data, error} = await supabase.from('notebooks').delete().eq('id', notebook.id)
-                    
+            <a href={`/notebook/${notebook.id}/edit`} class="btn btn-outline btn-accent btn-xs">Edit</a>
+            <button
+                on:click|preventDefault|stopPropagation={async () => {
+                    const { data, error } = await supabase.from('notebooks').delete().eq('id', notebook.id);
+
                     if (error) {
-                        
+                        errorToast('Cannot delete notebook. Please remove cells inside.');
+                        return;
                     }
 
                     await invalidateAll();
                     // console.log(await supabase.from('notebooks').delete().eq('id', notebook.id
-            }}} class="btn btn-xs btn-outline btn-error mr-auto">Delete</button>
+                }}
+                class="btn btn-outline btn-error btn-xs mr-auto">Delete</button>
 
             <span class="text-xs">created {getRelativeTime(new Date(notebook.created_at))}</span>
         </div>

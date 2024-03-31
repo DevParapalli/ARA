@@ -1,11 +1,10 @@
 <script lang="ts">
-    import type { PageData } from "./$types";
+    import type { PageData } from './$types';
 
-    import NotebookHomeComponent from "$lib/components/NotebookHomeComponent.svelte";
-    import { invalidate } from "$app/navigation";
-    import { flip } from "svelte/animate";
-    import { fade } from "svelte/transition";
-
+    import NotebookHomeComponent from '$lib/components/NotebookHomeComponent.svelte';
+    import { invalidate } from '$app/navigation';
+    import { flip } from 'svelte/animate';
+    import { fade } from 'svelte/transition';
 
     export let data: PageData;
 
@@ -53,7 +52,7 @@
         </div>
     </div>
 
-    <div class="flex flex-wrap justify-center lg:justify-normal lg:items-start gap-4 p-10">
+    <div class="flex flex-wrap justify-center gap-4 p-10 lg:items-start lg:justify-normal">
         {#if data.data}
             {#each data.data as notebook, i (notebook.id)}
                 <div transition:fade class="contents">

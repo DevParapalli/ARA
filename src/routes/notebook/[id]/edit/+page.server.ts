@@ -3,13 +3,12 @@ import { fail, redirect, error } from '@sveltejs/kit';
 
 export const actions = {
     create: async (event) => {
-        const { request, locals, params} = event;
+        const { request, locals, params } = event;
         const formData = await request.formData();
 
         const name = formData.get('name');
 
         const notes = formData.get('notes');
-
 
         if (typeof name !== 'string' || typeof notes !== 'string') {
             return fail(400, {
@@ -62,15 +61,16 @@ export const actions = {
         }
 
         // Save the notebook to the database
-        await locals.supabase.from('notebooks').update({
-            name,
-            notes,
-        })
-        .eq('id', params.id)
+        await locals.supabase
+            .from('notebooks')
+            .update({
+                name,
+                notes,
+            })
+            .eq('id', params.id);
 
         // console.log(JSON.stringify(notebook))
 
-                
         redirect(307, `/notebook/${params.id}`);
     },
 };
@@ -82,14 +82,13 @@ export async function load({ locals: { getSession, supabase }, params }) {
         redirect(303, '/');
     }
 
-    const {data, error: DBError} = await supabase.from('notebooks').select('*').eq('id', params.id).single();
+    const { data, error: DBError } = await supabase.from('notebooks').select('*').eq('id', params.id).single();
 
     if (DBError) {
         error(500, 'Database Error');
     }
 
     return {
-        notebook: data
-    }
-
+        notebook: data,
+    };
 }
