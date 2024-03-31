@@ -24,7 +24,7 @@
             error_on: '',
         };
 
-        console.log(form);
+        // console.log(form);
     }
 
     $: ({ supabase, session } = data);

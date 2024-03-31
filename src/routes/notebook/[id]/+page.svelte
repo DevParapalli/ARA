@@ -25,9 +25,7 @@
 
     let cells: Tables<'cells'>[] = [];
     onMount(() => {
-
         document.getElementById('runner-selector-modal')?.showModal();
-        
 
         (async () => {
             const { data, error } = await supabase
@@ -43,15 +41,15 @@
             }
         })();
 
-        heartbeat().then((status) => {
-            if (status) {
-                ai_cell_disabled = false;
-            }
-        });
-        const interval = setInterval(heartbeat, 20000);
-        return () => {
-            clearInterval(interval);
-        };
+        // heartbeat().then((status) => {
+        //     if (status) {
+        //         ai_cell_disabled = false;
+        //     }
+        // });
+        // const interval = setInterval(heartbeat, 20000);
+        // return () => {
+        //     clearInterval(interval);
+        // };
     });
 
     function handleAddCellUser() {
@@ -107,7 +105,7 @@
 
         (async (cell_index) => {
             // console.log('Cell index:', cell_index);
-            infoToast('Connecting...')
+            infoToast('Connecting...');
             const result = (await ragChain.stream({
                 prompt: promptValue,
                 context: convert_cells_to_context(cells),
@@ -126,18 +124,18 @@
                             if (typeof chunk.content === 'string' && chunk.content.length > 13)
                                 // '__citation__:'
                                 citations.push(JSON.parse(chunk.content.slice(13))[0]);
-                                if (status == 2) {
-                                    infoToast('Citing Sources...');
-                                    status = 0;
-                                }
+                            if (status == 2) {
+                                infoToast('Citing Sources...');
+                                status = 0;
+                            }
                         } else if ((chunk.content as string).startsWith('__search_queries__')) {
                             if (typeof chunk.content === 'string' && chunk.content.length > 19)
                                 // '__search_queries__:'
                                 Object.assign(metadata, { search_metadata: JSON.parse(chunk.content.slice(19))[0] });
-                                if (status == 0) {
-                                    infoToast('Deep diving...');
-                                    status = 1;
-                                }
+                            if (status == 0) {
+                                infoToast('Deep diving...');
+                                status = 1;
+                            }
                         } else if ((chunk.content as string).startsWith('__search_results__')) {
                             if (typeof chunk.content === 'string' && chunk.content.length > 19) {
                                 // '__search_results__:'
@@ -190,24 +188,26 @@
         promptValue = '';
     }
 
-    let conn_status = 'Disconnected';
-    let conn_status_flag = 'text-red-500';
+    let conn_status = false;
+    // let conn_status_flag = 'text-red-500';
 
     async function heartbeat() {
         try {
-            conn_status = 'Connecting...';
-            conn_status_flag = 'text-yellow-500';
+            // conn_status = 'Connecting...';
+            // conn_status_flag = 'text-yellow-500';
             await fetch(heartbeat_url);
-            conn_status = 'Connected';
-            conn_status_flag = 'text-green-500';
+            conn_status = true;
+            // conn_status_flag = 'text-green-500';
 
             // set allow for other things...
             // ai_cell_disabled = false;
             return true;
         } catch (e) {
-            conn_status = 'Disconnected';
-            conn_status_flag = 'text-red-500';
+            conn_status = false;
+            // conn_status_flag = 'text-red-500';
             console.error(e);
+            // ai_cell_disabled = true;
+            errorToast('Connection to the server lost. Please reconnect');
             return false;
         }
     }
@@ -217,7 +217,7 @@
 
     async function handle_rewriting_cell(content: string, action: string) {
         if (cell_index_to_rewrite == -1) {
-            errorToast("Error with Cell Connection")
+            errorToast('Error with Cell Connection');
             return;
         }
         ai_cell_disabled = true;
@@ -246,7 +246,6 @@
                 }
             });
 
-
         // let new_cell = { id: 'ABC', notebook: $page.params.id, content: promptValue };
         // cells = [...cells, new_cell];
 
@@ -260,17 +259,17 @@
         const result = await noragChain.stream({
             prompt: `${content}\n\n${action}`,
             context: '',
-        })
+        });
 
         response = '';
         metadata = {};
         sources = [];
 
-        infoToast('Generating Content...')
+        infoToast('Generating Content...');
 
         infoToast('Understanding...', {
-            duration: 5000
-        })
+            duration: 5000,
+        });
 
         for await (const chunk of result) {
             if (typeof chunk === 'string') {
@@ -288,7 +287,7 @@
             } else {
                 // other.merge(chunk);
                 console.debug(chunk);
-            } 
+            }
         }
 
         cells[cell_index].metadata = Object.assign(cells[cell_index].metadata || {}, metadata);
@@ -344,9 +343,9 @@
                     <div class="flex w-full items-center justify-evenly gap-4 px-4">
                         <button
                             on:click={() => {
-                                if (ai_cell_disabled && conn_status == 'Connected') {
+                                if (ai_cell_disabled && conn_status) {
                                     errorToast(
-                                        'Cannot modify cells while LLMs are running. Please wait for the LLMs to finish generation.'
+                                        'Cannot modify cells while in an inconsistent state. Please wait for API to respond.'
                                     );
                                     return;
                                 }
@@ -383,11 +382,13 @@
                                     d="M758.2 839.1C851.8 765.9 912 651.9 912 523.9C912 303 733.5 124.3 512.6 124C291.4 123.7 112 302.8 112 523.9c0 125.2 57.5 236.9 147.6 310.2c3.5 2.8 8.6 2.2 11.4-1.3l39.4-50.5c2.7-3.4 2.1-8.3-1.2-11.1c-8.1-6.6-15.9-13.7-23.4-21.2a318.64 318.64 0 0 1-68.6-101.7C200.4 609 192 567.1 192 523.9s8.4-85.1 25.1-124.5c16.1-38.1 39.2-72.3 68.6-101.7c29.4-29.4 63.6-52.5 101.7-68.6C426.9 212.4 468.8 204 512 204s85.1 8.4 124.5 25.1c38.1 16.1 72.3 39.2 101.7 68.6c29.4 29.4 52.5 63.6 68.6 101.7c16.7 39.4 25.1 81.3 25.1 124.5s-8.4 85.1-25.1 124.5a318.64 318.64 0 0 1-68.6 101.7c-9.3 9.3-19.1 18-29.3 26L668.2 724a8 8 0 0 0-14.1 3l-39.6 162.2c-1.2 5 2.6 9.9 7.7 9.9l167 .8c6.7 0 10.5-7.7 6.3-12.9z" /></svg>
                         </button>
 
-                        <button on:click={() => {
-                            const modal = document.getElementById('rewrite-prompt-modal');
-                            cell_index_to_rewrite = cells.findIndex((c) => c.id === cell.id);
-                            modal?.showModal();
-                        }} class="btn btn-ghost btn-sm px-1">
+                        <button
+                            on:click={() => {
+                                const modal = document.getElementById('rewrite-prompt-modal');
+                                cell_index_to_rewrite = cells.findIndex((c) => c.id === cell.id);
+                                modal?.showModal();
+                            }}
+                            class="btn btn-ghost btn-sm px-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024"
                                 ><path
                                     fill="currentColor"
@@ -397,7 +398,7 @@
                 </div>
             </div>
             {#if cell.type === 'generated' && Array.isArray(cell.sources) && cell.sources.length > 0}
-                <div id="sources-container-{cell.id}" class="mx-auto overflow-y-auto p-4 lg:w-[30%] w-full">
+                <div id="sources-container-{cell.id}" class="mx-auto w-full overflow-y-auto p-4 lg:w-[30%]">
                     <span class="lg:hidden">Sources:</span>
                     <div class="flex flex-col items-center gap-y-1">
                         {#each cell.sources as source}
@@ -428,6 +429,10 @@
                     const modal = document.getElementById('ai_prompt_modal');
                     modal?.showModal();
                 }}>Add AI Cell</button>
+            <button on:click={() =>{
+                const modal = document.getElementById('runner-selector-modal');
+                modal?.showModal();
+            }} class="btn btn-accent">Runner Config</button>
         </div>
     {:else}
         <div class="flex w-full flex-row justify-center gap-4">
@@ -471,9 +476,11 @@
             <div class="modal-action">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
-                    <button on:click|preventDefault={() => {
-                        handle_rewriting_cell(cells[cell_index_to_rewrite].content, rewrite_prompt);
-                    }} class="btn btn-primary w-20">Submit</button>
+                    <button
+                        on:click|preventDefault={() => {
+                            handle_rewriting_cell(cells[cell_index_to_rewrite].content, rewrite_prompt);
+                        }}
+                        class="btn btn-primary w-20">Submit</button>
                     <button
                         on:click={() => {
                             ai_cell_disabled = false;
@@ -487,28 +494,48 @@
     <dialog id="runner-selector-modal" class="modal">
         <div class="modal-box">
             <h3 class="pb-4 text-lg font-bold">Runner Selection</h3>
-            <p class="py-4">Make a choice to close modal, choice will persist until the notebook is open. If in doubt, use Remote.</p>
+            <p class="py-4">
+                Make a choice to close modal, choice will persist until the notebook is open. If in doubt, use Remote.
+            </p>
             <div class="modal-action">
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
-                    <button on:click={() => {
-                        console.log('[I] Local Runner Selected');
-                    }} class="btn btn-primary w-20">Local</button>
-                    <button on:click={() => {
-                        console.log('[I] Remote Runner Selected');
-                        ragChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/rag' });
-                        noragChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/norag' });
-                        heartbeat_url = 'https://ara-api.parapalli.dev';
+                    <button
+                        on:click={() => {
+                            console.log('[I] Local Runner Selected');
+                            ragChain = new RemoteRunnable({ url: 'http://localhost:4945/rag' });
+                            noragChain = new RemoteRunnable({ url: 'http://localhost:4945/norag' });
+                            heartbeat_url = 'http://localhost:4945';
 
-                        heartbeat().then();
-                    }}
-                    class="btn btn-error w-20">Remote</button>
+                            heartbeat().then((status) => {
+                                if (status) {
+                                    successToast('Connected to local runners')
+                                    ai_cell_disabled = false;
+                                } else errorToast('Cannot connect to Local Runner, make sure it is running.', {duration: 10000})
+                            });
+                        }}
+                        class="btn btn-primary w-20">Local</button>
+                    <button
+                        on:click={() => {
+                            console.log('[I] Remote Runner Selected');
+                            ragChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/rag' });
+                            noragChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/norag' });
+                            heartbeat_url = 'https://ara-api.parapalli.dev';
+
+                            heartbeat().then((E) => {
+                                if (E) {
+                                    successToast('Connected to remote runners')
+                                    ai_cell_disabled = false;
+                                } else errorToast('Cannot connect to Remote Runner. Check your connection', {duration: 10000})
+                            });
+                        }}
+                        class="btn btn-error w-20">Remote</button>
                 </form>
             </div>
         </div>
     </dialog>
 
-    <div class="fixed bottom-0 right-6">
+    <!-- <div class="fixed bottom-0 right-6">
         <span class={conn_status_flag}>{conn_status}</span>
-    </div>
+    </div> -->
 </div>
