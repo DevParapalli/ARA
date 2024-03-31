@@ -206,6 +206,102 @@
         }
     }
 
+    let cell_index_to_rewrite = -1;
+    let rewrite_prompt = '';
+
+    async function handle_rewriting_cell(content: string, action: string) {
+        if (cell_index_to_rewrite == -1) {
+            errorToast("Error with Cell Connection")
+            return;
+        }
+        ai_cell_disabled = true;
+
+        let cell_index = -1;
+
+        infoToast('Connecting...');
+
+        supabase
+            .from('cells')
+            .insert({
+                notebook: $page.params.id,
+                type: 'generated',
+                content: '',
+                metadata: {
+                    prompt: promptValue,
+                },
+            })
+            .select()
+            .single()
+            .then(({ data, error }) => {
+                error ? console.error(error) : dev && console.debug(data);
+                if (data) {
+                    cells = [...cells, data];
+                    cell_index = cells.findIndex((c) => c.id === data.id);
+                }
+            });
+
+
+        // let new_cell = { id: 'ABC', notebook: $page.params.id, content: promptValue };
+        // cells = [...cells, new_cell];
+
+        const modal = document.getElementById('rewrite-prompt-modal');
+        modal?.close(); // @ts-ignore
+
+        let metadata = {};
+        let sources = [];
+        let response = '';
+
+        const result = await noragChain.stream({
+            prompt: `${content}\n\n${action}`,
+            context: '',
+        })
+
+        response = '';
+        metadata = {};
+        sources = [];
+
+        infoToast('Generating Content...')
+
+        infoToast('Understanding...', {
+            duration: 5000
+        })
+
+        for await (const chunk of result) {
+            if (typeof chunk === 'string') {
+                response += chunk;
+                cells[cell_index].content += chunk as string;
+                continue;
+            }
+            if ('run_id' in (chunk as object) || 'prompt' in (chunk as object) || 'context' in (chunk as object)) {
+                metadata = Object.assign(metadata, chunk);
+            } else if ('sources' in (chunk as object)) {
+                sources = chunk as Array<object>;
+            } else if ('response' in (chunk as object)) {
+                response += chunk['response'] as string;
+                cells[cell_index].content += chunk.response as string;
+            } else {
+                // other.merge(chunk);
+                console.debug(chunk);
+            } 
+        }
+
+        cells[cell_index].metadata = Object.assign(cells[cell_index].metadata || {}, metadata);
+        cells[cell_index].sources = sources;
+        cells[cell_index].content = response;
+        const { data, error } = await supabase.from('cells').upsert(cells[cell_index]).select().single();
+
+        if (error || !data) {
+            console.error(error);
+        } else {
+            console.debug(data);
+            cells[cell_index] = data;
+        }
+        // Remote Model Invocation
+        successToast('RMI Complete!');
+
+        ai_cell_disabled = false;
+    }
+
     let deleting_cell = false;
 </script>
 
@@ -281,7 +377,11 @@
                                     d="M758.2 839.1C851.8 765.9 912 651.9 912 523.9C912 303 733.5 124.3 512.6 124C291.4 123.7 112 302.8 112 523.9c0 125.2 57.5 236.9 147.6 310.2c3.5 2.8 8.6 2.2 11.4-1.3l39.4-50.5c2.7-3.4 2.1-8.3-1.2-11.1c-8.1-6.6-15.9-13.7-23.4-21.2a318.64 318.64 0 0 1-68.6-101.7C200.4 609 192 567.1 192 523.9s8.4-85.1 25.1-124.5c16.1-38.1 39.2-72.3 68.6-101.7c29.4-29.4 63.6-52.5 101.7-68.6C426.9 212.4 468.8 204 512 204s85.1 8.4 124.5 25.1c38.1 16.1 72.3 39.2 101.7 68.6c29.4 29.4 52.5 63.6 68.6 101.7c16.7 39.4 25.1 81.3 25.1 124.5s-8.4 85.1-25.1 124.5a318.64 318.64 0 0 1-68.6 101.7c-9.3 9.3-19.1 18-29.3 26L668.2 724a8 8 0 0 0-14.1 3l-39.6 162.2c-1.2 5 2.6 9.9 7.7 9.9l167 .8c6.7 0 10.5-7.7 6.3-12.9z" /></svg>
                         </button>
 
-                        <button class="btn btn-ghost btn-sm px-1">
+                        <button on:click={() => {
+                            const modal = document.getElementById('rewrite-prompt-modal');
+                            cell_index_to_rewrite = cells.findIndex((c) => c.id === cell.id);
+                            modal?.showModal();
+                        }} class="btn btn-ghost btn-sm px-1">
                             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 1024 1024"
                                 ><path
                                     fill="currentColor"
@@ -291,7 +391,7 @@
                 </div>
             </div>
             {#if cell.type === 'generated' && Array.isArray(cell.sources) && cell.sources.length > 0}
-                <div id="sources-container-{cell.id}" class="mx-auto overflow-y-auto p-4 lg:w-[30%]">
+                <div id="sources-container-{cell.id}" class="mx-auto overflow-y-auto p-4 lg:w-[30%] w-full">
                     <span class="lg:hidden">Sources:</span>
                     <div class="flex flex-col items-center gap-y-1">
                         {#each cell.sources as source}
@@ -343,6 +443,31 @@
                 <form method="dialog">
                     <!-- if there is a button in form, it will close the modal -->
                     <button on:click|preventDefault={handleAddCellAI} class="btn btn-primary w-20">Submit</button>
+                    <button
+                        on:click={() => {
+                            ai_cell_disabled = false;
+                        }}
+                        class="btn btn-error w-20">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="rewrite-prompt-modal" class="modal">
+        <div class="modal-box">
+            <h3 class="pb-4 text-lg font-bold">Style of rewriting ?</h3>
+            <!-- <p class="py-4">Press ESC key or click the button below to close</p> -->
+            <input
+                type="text"
+                placeholder="What do you want the model to do ?"
+                class="input input-primary w-full font-mono"
+                bind:value={rewrite_prompt} />
+            <div class="modal-action">
+                <form method="dialog">
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button on:click|preventDefault={() => {
+                        handle_rewriting_cell(cells[cell_index_to_rewrite].content, rewrite_prompt);
+                    }} class="btn btn-primary w-20">Submit</button>
                     <button
                         on:click={() => {
                             ai_cell_disabled = false;

@@ -1,8 +1,13 @@
+import os
+
+from dotenv import load_dotenv
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from langserve import add_routes
 from norag import chain as norag_chain
 from rag import chain as rag_chain
+
+load_dotenv()
 
 app = FastAPI(title="LLM Runner", version="0.0.3")
 
@@ -25,5 +30,5 @@ async def read_root():
 
 if __name__ == "__main__":
     import uvicorn
-
-    uvicorn.run(app, host="0.0.0.0", port=4945, timeout_keep_alive=3600)
+    PORT = int(os.getenv("PORT", 4945))
+    uvicorn.run(app, host="0.0.0.0", port=PORT, timeout_keep_alive=3600)

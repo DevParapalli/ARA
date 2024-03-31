@@ -233,7 +233,7 @@
             } else if ('response' in (chunk as object)) {
                 response += chunk['response'] as string;
             } else {
-                other.merge(chunk);
+                // other.merge(chunk);
                 console.debug(chunk);
             }
             // console.debug(chunk);
