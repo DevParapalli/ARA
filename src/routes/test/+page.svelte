@@ -71,7 +71,7 @@
     async function test_response() {
         isloading = true;
         try {
-            const res = await fetch('http://localhost:4945');
+            const res = await fetch('https://ara-api.parapalli.dev');
             const _data = await res.json();
             response = JSON.stringify(_data);
         } catch (e) {
@@ -89,7 +89,7 @@
         status = 'Connecting to localhost-server...';
         status_flag = 'text-warning';
         try {
-            const res = await fetch('http://localhost:4945');
+            const res = await fetch('https://ara-api.parapalli.dev');
             // const _data = await res.json()
             // data = JSON.stringify(_data)
             isloading = false;
@@ -108,7 +108,7 @@
     async function test_langserve_rag() {
         isloading = true;
         try {
-            const res = await fetch('http://localhost:4945');
+            const res = await fetch('https://ara-api.parapalli.dev');
         } catch (e) {
             alert('local server not running');
             console.debug(e);
@@ -120,7 +120,7 @@
             prompt = 'Explain the technology behind Claude 3';
         }
 
-        const remoteChain = new RemoteRunnable({ url: 'http://localhost:4945/rag' });
+        const remoteChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/rag' });
         // const result = await remoteChain.streamLog({prompt: prompt, context: "Machine Learning"})
         // response = ""
         // metadata = {}
@@ -204,7 +204,7 @@
     async function test_langserve_norag() {
         isloading = true;
         try {
-            const res = await fetch('http://localhost:4945');
+            const res = await fetch('https://ara-api.parapalli.dev');
         } catch (e) {
             alert('local server not running');
             console.debug(e);
@@ -216,7 +216,7 @@
             prompt = 'Explain Mixture of Experts.';
         }
 
-        const remoteChain = new RemoteRunnable({ url: 'http://localhost:4945/norag' });
+        const remoteChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/norag' });
         const result = await remoteChain.stream({ prompt: prompt, context: context });
         response = '';
         metadata = {};

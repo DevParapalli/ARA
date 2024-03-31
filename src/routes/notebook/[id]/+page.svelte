@@ -18,11 +18,17 @@
     export let data: PageData;
     $: ({ supabase } = data);
 
-    const ragChain = new RemoteRunnable({ url: 'http://localhost:4945/rag' });
-    const noragChain = new RemoteRunnable({ url: 'http://localhost:4945/norag' });
+    let ragChain = new RemoteRunnable({ url: 'http://localhost:4945/rag' });
+    let noragChain = new RemoteRunnable({ url: 'http://localhost:4945/norag' });
+    let heartbeat_url = 'http://localhost:4945';
+    // let runner_choice = 'local';
 
     let cells: Tables<'cells'>[] = [];
     onMount(() => {
+
+        document.getElementById('runner-selector-modal')?.showModal();
+        
+
         (async () => {
             const { data, error } = await supabase
                 .from('cells')
@@ -42,10 +48,10 @@
                 ai_cell_disabled = false;
             }
         });
-        // const interval = setInterval(heartbeat, 20000);
-        // return () => {
-        //     clearInterval(interval);
-        // };
+        const interval = setInterval(heartbeat, 20000);
+        return () => {
+            clearInterval(interval);
+        };
     });
 
     function handleAddCellUser() {
@@ -191,7 +197,7 @@
         try {
             conn_status = 'Connecting...';
             conn_status_flag = 'text-yellow-500';
-            await fetch('http://localhost:4945');
+            await fetch(heartbeat_url);
             conn_status = 'Connected';
             conn_status_flag = 'text-green-500';
 
@@ -473,6 +479,30 @@
                             ai_cell_disabled = false;
                         }}
                         class="btn btn-error w-20">Cancel</button>
+                </form>
+            </div>
+        </div>
+    </dialog>
+
+    <dialog id="runner-selector-modal" class="modal">
+        <div class="modal-box">
+            <h3 class="pb-4 text-lg font-bold">Runner Selection</h3>
+            <p class="py-4">Make a choice to close modal, choice will persist until the notebook is open. If in doubt, use Remote.</p>
+            <div class="modal-action">
+                <form method="dialog">
+                    <!-- if there is a button in form, it will close the modal -->
+                    <button on:click={() => {
+                        console.log('[I] Local Runner Selected');
+                    }} class="btn btn-primary w-20">Local</button>
+                    <button on:click={() => {
+                        console.log('[I] Remote Runner Selected');
+                        ragChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/rag' });
+                        noragChain = new RemoteRunnable({ url: 'https://ara-api.parapalli.dev/norag' });
+                        heartbeat_url = 'https://ara-api.parapalli.dev';
+
+                        heartbeat().then();
+                    }}
+                    class="btn btn-error w-20">Remote</button>
                 </form>
             </div>
         </div>
