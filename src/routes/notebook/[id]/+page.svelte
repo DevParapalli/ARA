@@ -14,6 +14,7 @@
     import SourceCell from '$lib/components/SourceCell.svelte';
     import { flip } from 'svelte/animate';
     import { errorToast, infoToast, successToast } from '$lib/toast';
+    import { fade, slide } from 'svelte/transition';
 
     export let data: PageData;
     $: ({ supabase } = data);
@@ -316,7 +317,7 @@
 
 <div class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
-        <div animate:flip class="flex w-full flex-col lg:flex-row">
+        <div in:fade class="flex w-full flex-col lg:flex-row">
             <div
                 id="cell-container-{cell.id}"
                 on:focusout={(e) => {
@@ -401,8 +402,10 @@
                 <div id="sources-container-{cell.id}" class="mx-auto w-full overflow-y-auto p-4 lg:w-[30%]">
                     <span class="lg:hidden">Sources:</span>
                     <div class="flex flex-col items-center gap-y-1">
-                        {#each cell.sources as source}
-                            <SourceCell {source} />
+                        {#each cell.sources as source, i}
+                            <div in:fade={{delay: i * 100}} class="contents">
+                                <SourceCell {source} />
+                            </div>
                         {/each}
                     </div>
                 </div>
@@ -410,6 +413,7 @@
         </div>
     {:else}
         <div class="flex flex-col items-center p-10 w-full">
+            This notebook contains no cells, use the buttons below to create the first cell
             <div class="skeleton h-96 w-full"></div>
             <div class="skeleton h-6 w-[50%] mb-10"></div>
             <div class="skeleton h-6 w-[50%] mb-10"></div>

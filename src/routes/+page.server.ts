@@ -5,7 +5,10 @@ export async function load({ locals: { getSession, supabase } }) {
     const session = await getSession();
     // if the user is not logged in redirect back to the home page
     if (!session) {
-        redirect(303, '/auth/login?next=/');
+        // redirect(303, '/auth/login?next=/');
+        return {
+            data: null
+        }
     }
 
     const { data, error } = await supabase

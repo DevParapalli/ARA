@@ -2,7 +2,7 @@
     import '../app.pcss';
     import { enhance } from '$app/forms';
     import { invalidate, invalidateAll, goto, beforeNavigate } from '$app/navigation';
-    import { onMount } from 'svelte';
+    import { onMount, tick } from 'svelte';
     import toast, { Toaster } from 'svelte-french-toast';
     import { infoToast, normalToast, successToast } from '$lib/toast';
     export let data;
@@ -92,7 +92,11 @@
         <label for="sidebar-drawer" aria-label="close sidebar" class="drawer-overlay"></label>
         <ul class="menu min-h-full w-80 bg-base-300 p-4 text-base-content">
             <!-- Sidebar content here -->
-            <li class="flex items-center"><button on:dblclick={() => {
+            <li class="flex items-center"><button on:click={() => {
+                tick().then(() => {
+                    goto('/')
+                })
+            }} on:dblclick={() => {
                 goto('/test');
             }} class="font-dune text-6xl">ARA</button></li>
             <hr class="border-base-content/30 my-4">
@@ -138,3 +142,4 @@
         display: inline;
     }
 </style>
+

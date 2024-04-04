@@ -30,5 +30,8 @@ async def read_root():
 
 if __name__ == "__main__":
     import uvicorn
+    import sys
+    sys.stdin.reconfigure(encoding='utf-8')
+    sys.stdout.reconfigure(encoding='utf-8')
     PORT = int(os.getenv("PORT", 4945))
     uvicorn.run(app, host="0.0.0.0", port=PORT, timeout_keep_alive=3600)

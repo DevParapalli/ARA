@@ -11,7 +11,7 @@
 
 <a
     href={`/notebook/${notebook.id}`}
-    class="aspect-[9/16] w-64 rounded-box border-2 border-base-content/25 bg-base-200 p-4 transition-colors hover:border-base-content/60 hover:bg-base-100">
+    class="aspect-video h-64 rounded-box border-2 border-base-content/25 bg-base-200 p-4 transition-colors hover:border-base-content/60 hover:bg-base-100">
     <div class="flex h-full flex-col gap-2">
         <div class="inline-flex items-center justify-between">
             <h2 class="line-clamp-1 text-2xl">{notebook.name}</h2>
