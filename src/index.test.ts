@@ -31,8 +31,8 @@ describe('sources_order', () => {
 
 
 
-describe('convert_cells_to_context', () => {
-    it('converts cells to context', () => {
+describe('no broken links', () => {
+    it('checks the entire app to verify no broken links', () => {
         const cells = [
             {
                 id: 1,
