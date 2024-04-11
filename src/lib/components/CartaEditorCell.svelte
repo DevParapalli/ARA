@@ -8,7 +8,7 @@
     // import 'carta-md/dark.css';
     import DOMPurify from 'isomorphic-dompurify';
     import { onMount } from 'svelte';
-
+    import 'katex/dist/katex.css';
     const carta = new Carta({
         extensions: [
             attachment({
