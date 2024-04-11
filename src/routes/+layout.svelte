@@ -7,6 +7,10 @@
     import { infoToast, normalToast, successToast } from '$lib/toast';
     export let data;
 
+    import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+
+    injectSpeedInsights();
+
     $: ({ supabase } = data);
 
     let user_id: string;
