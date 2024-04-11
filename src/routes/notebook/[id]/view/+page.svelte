@@ -87,7 +87,7 @@
         </div>
     {:else}
         <div class="flex flex-col items-center p-10 w-full">
-            This notebook contains no cells, use the buttons below to create the first cell
+            There is something wrong with this link, ask the sender to recheck.
             <div class="skeleton h-96 w-full"></div>
             <div class="skeleton h-6 w-[50%] mb-10"></div>
             <div class="skeleton h-6 w-[50%] mb-10"></div>
