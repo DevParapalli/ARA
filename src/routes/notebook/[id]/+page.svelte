@@ -315,7 +315,10 @@
     <title>Notebook {$page.params.id} | Project ARA</title>
 </svelte:head>
 
-<div class="relative flex flex-col items-center p-10">
+<h1 class="mx-auto text-6xl mt-4 text-center">{data.info?.name}</h1>
+<h2 class="mx-auto text-xl mt-8 md:mt-4 text-center">{data.info?.notes}</h2>
+
+<div class="relative flex flex-col items-center py-10 px-2 md:p-10">
     {#each cells as cell (cell.id)}
         <div in:fade class="flex w-full flex-col lg:flex-row">
             <div
@@ -423,7 +426,7 @@
     {/each}
 
     {#if supabase && supabase.auth.getSession()}
-        <div class="flex flex-row items-center justify-center gap-4">
+        <div class="flex flex-row items-center justify-center gap-4 flex-wrap md:flex-nowrap">
             <button class="btn btn-primary" on:click={handleAddCellUser}>Add User Cell</button>
             <button
                 disabled={ai_cell_disabled}
@@ -439,7 +442,7 @@
             }} class="btn btn-accent">Runner Config</button>
         <button on:click={() => {
             navigator.clipboard.writeText(`${($page.url.origin)}/notebook/${$page.params.id}/view`)
-            infoToast('Copied to clipboard.').
+            infoToast('Copied to clipboard.')
         }} class="btn">Copy View Only Link</button>    
     </div>
 

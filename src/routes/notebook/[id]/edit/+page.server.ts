@@ -2,7 +2,7 @@ import { Tables } from '$lib/supabaseTypes.js';
 import { fail, redirect, error } from '@sveltejs/kit';
 
 export const actions = {
-    create: async (event) => {
+    edit: async (event) => {
         const { request, locals, params } = event;
         const formData = await request.formData();
 
@@ -71,7 +71,7 @@ export const actions = {
 
         // console.log(JSON.stringify(notebook))
 
-        redirect(307, `/notebook/${params.id}`);
+        redirect(307, `/`);
     },
 };
 

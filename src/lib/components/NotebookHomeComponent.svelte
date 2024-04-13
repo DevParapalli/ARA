@@ -1,7 +1,8 @@
 <script lang="ts">
-    import { invalidate, invalidateAll } from '$app/navigation';
+    import { goto, invalidate, invalidateAll } from '$app/navigation';
+    import { page } from '$app/stores';
     import type { Database, Tables } from '$lib/supabaseTypes';
-    import { errorToast } from '$lib/toast';
+    import { errorToast, infoToast } from '$lib/toast';
     import { getRelativeTime } from '$lib/utils';
     import type { SupabaseClient } from '@supabase/supabase-js';
     import toast from 'svelte-french-toast';
@@ -11,20 +12,23 @@
 
 <a
     href={`/notebook/${notebook.id}`}
-    class="aspect-video h-64 rounded-box border-2 border-base-content/25 bg-base-200 p-4 transition-colors hover:border-base-content/60 hover:bg-base-100">
+    class="aspect-video w-full md:w-auto md:h-64 rounded-box border-2 border-base-content/25 bg-base-200 p-4 transition-colors hover:border-base-content/60 hover:bg-base-100">
     <div class="flex h-full flex-col gap-2">
         <div class="inline-flex items-center justify-between">
             <h2 class="line-clamp-1 text-2xl">{notebook.name}</h2>
+            {#if notebook.public}
             <span class="badge badge-warning px-1 py-2">Public</span>
+            {/if}
         </div>
-        <hr class="my-2 w-full border-base-100" />
+        <hr class="my-2 w-full border-base-100 h-fit hidden md:block" />
         {#if typeof notebook.notes === 'object' && notebook.notes !== null && 'field' in notebook.notes}
             <p class="line-clamp-2">{notebook.notes.field}</p>
-        {:else if notebook.notes !== null}
+            <hr class="my-2 w-full border-base-100 hidden md:block" />
+        {:else if notebook.notes}
             <p class="line-clamp-2">{notebook.notes}</p>
+            <hr class="my-2 w-full border-base-100 hidden md:block" />
         {/if}
-        <hr class="my-2 w-full border-base-100" />
-        <div class="mt-auto flex flex-row items-center justify-between gap-2">
+        <div class="mt-auto flex flex-row flex-wrap items-center justify-between gap-2">
             <!-- svelte-ignore a11y-no-noninteractive-element-interactions -->
             <!-- svelte-ignore a11y-click-events-have-key-events -->
             <!-- <details on:click|stopPropagation={() => {}} class="dropdown dropdown-top">
@@ -34,7 +38,7 @@
                 </ul>
             </details> -->
 
-            <a href={`/notebook/${notebook.id}/edit`} class="btn btn-outline btn-accent btn-xs">Edit</a>
+            <a href={`/notebook/${notebook.id}/edit`} class="btn btn-outline btn-accent btn-sm">Edit</a>
             <button
                 on:click|preventDefault|stopPropagation={async () => {
                     const { data, error } = await supabase.from('notebooks').delete().eq('id', notebook.id);
@@ -45,11 +49,17 @@
                     }
 
                     await invalidateAll();
+                    infoToast(`Successfully deleted ${notebook.name}.`)
                     // console.log(await supabase.from('notebooks').delete().eq('id', notebook.id
                 }}
-                class="btn btn-outline btn-error btn-xs mr-auto">Delete</button>
+                class="btn btn-outline btn-error btn-sm">Delete</button>
+            <button on:click|preventDefault|stopPropagation={async () => {
+                navigator.clipboard.writeText(`${($page.url.origin)}/notebook/${notebook.id}/view`)
+                infoToast('Copied to clipboard.')
+                // goto(`${($page.url.origin)}/notebook/${notebook.id}/view`)
+            }} class="btn btn-outline btn-secondary btn-sm md:mr-auto">Copy View Link</button>
 
-            <span class="text-xs">created {getRelativeTime(new Date(notebook.created_at))}</span>
+            <span title={`Created on ${new Date(notebook.created_at).toLocaleString()}`} class="text-xs">created {getRelativeTime(new Date(notebook.created_at))}</span>
         </div>
     </div>
 </a>

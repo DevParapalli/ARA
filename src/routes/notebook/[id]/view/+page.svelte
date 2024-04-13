@@ -47,6 +47,9 @@
     <title>Notebook {$page.params.id} | Project ARA</title>
 </svelte:head>
 
+<h1 class="mx-auto text-6xl mt-4 text-center">{data.info?.name}</h1>
+<h2 class="mx-auto text-xl mt-8 md:mt-4 text-center">{data.info?.notes}</h2>
+
 <div class="relative flex flex-col items-center p-10">
     {#each cells as cell (cell.id)}
         <div in:fade class="flex w-full flex-col lg:flex-row">

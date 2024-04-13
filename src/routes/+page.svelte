@@ -18,8 +18,10 @@
     let searchValue = '';
 
     $: data.data && searchValue
-        ? (filteredNotebooks = data.data.filter((notebook) =>
-              notebook.name?.toLowerCase().includes(searchValue.toLowerCase())
+        ? (filteredNotebooks = data.data.filter((notebook) => {
+            return notebook.name?.toLowerCase().includes(searchValue.toLowerCase()) || notebook.notes?.toString().toLowerCase().includes(searchValue.toLowerCase())
+        }
+              
           ))
         : (filteredNotebooks = data.data);
 </script>
@@ -46,7 +48,7 @@
 </div> -->
 {#if data.data}
     <div class="flex h-full w-full flex-col p-5">
-        <div class="action-buttons flex w-full flex-row gap-x-3">
+        <div class="action-buttons flex w-full flex-row md:justify-start justify-evenly gap-x-3">
             <a href="/notebook/new" class="btn btn-primary btn-sm"> New Notebook </a>
 
             <div class="join">
@@ -68,9 +70,9 @@
                 </label>
             </div>
         </div>
-        <h1 class="mx-auto text-6xl">Notebooks</h1>
+        <h1 class="mx-auto text-6xl mt-4 md:mt-0">Notebooks</h1>
 
-        <div class="flex flex-wrap justify-center gap-4 p-10 lg:items-start lg:justify-normal">
+        <div class="flex flex-wrap justify-center gap-2 px-4 py-10 lg:items-start lg:justify-normal">
             {#if filteredNotebooks}
                 {#each filteredNotebooks as notebook, i (notebook.id)}
                     <div transition:fade class="contents">

@@ -72,7 +72,7 @@
             <input type="hidden" name="user_id" value={session?.user.id} />
             <div class="mt-2 flex w-full justify-between">
                 <a href="/" class="btn btn-outline btn-sm">Cancel</a>
-                <button class="btn btn-primary btn-sm" type="submit">Create</button>
+                <button class="btn btn-primary btn-sm" type="submit">Update</button>
                 <!-- <a class="link link-info mr-auto" href="/auth/reset_password">Reset password</a> -->
             </div>
         </form>
