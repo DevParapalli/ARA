@@ -439,6 +439,7 @@
             }} class="btn btn-accent">Runner Config</button>
         <button on:click={() => {
             navigator.clipboard.writeText(`${($page.url.origin)}/notebook/${$page.params.id}/view`)
+            infoToast('Copied to clipboard.').
         }} class="btn">Copy View Only Link</button>    
     </div>
 
