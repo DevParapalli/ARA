@@ -1,5 +1,6 @@
 import { fail, redirect } from '@sveltejs/kit';
 import { AuthApiError } from '@supabase/supabase-js';
+import { HTTPClientError } from '$lib/https.js';
 
 export const actions = {
     register: async (event) => {
@@ -7,6 +8,13 @@ export const actions = {
         const formData = await request.formData();
         const email = formData.get('email');
         const password = formData.get('password');
+
+        return fail(HTTPClientError.UnprocessableEntity, {
+            error: 'registrationClosed',
+            email: email,
+            invalid: true,
+            message: "The server is unable to process registrations at this time."
+        })
 
         const { data, error: err } = await locals.supabase.auth.signUp({
             email: email,
