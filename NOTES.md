@@ -118,3 +118,11 @@
 ## Hosting Server
 
 -   <https://fly.io/docs/languages-and-frameworks/python/>
+
+## Sample Test prompts for demonstration.
+
+- Explain the difference between bagging and boosting.
+- How does the JPEG Compression Algorithm Work ?
+- Where can I find the latest LLM Models ?
+- What is supervised learning, what kind of datasets can be used for supervised learning ?
+- Explain React Compiler.
