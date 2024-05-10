@@ -9,12 +9,12 @@ export const actions = {
         const email = formData.get('email');
         const password = formData.get('password');
 
-        return fail(HTTPClientError.UnprocessableEntity, {
-            error: 'registrationClosed',
-            email: email,
-            invalid: true,
-            message: "The server is unable to process registrations at this time."
-        })
+        // return fail(HTTPClientError.UnprocessableEntity, {
+        //     error: 'registrationClosed',
+        //     email: email,
+        //     invalid: true,
+        //     message: "The server is unable to process registrations at this time."
+        // })
 
         const { data, error: err } = await locals.supabase.auth.signUp({
             email: email,
