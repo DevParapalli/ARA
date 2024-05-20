@@ -1,0 +1,78 @@
+-
+\usepackage{graphicx}
+% \graphicspath{ {./images/} }
+
+\title{ARA - AI-powered Research Assistant}
+\author{Kaustubh Warade, Aditya Deshmukh, Devansh Parapalli, Yashasvi Thool}
+\date{May 20, 2024}
+
+\begin{document}
+\maketitle
+
+\section*{Resources}
+\subsection*{Software}
+The key software components used in this project include:
+\begin{itemize}
+    \item Node.js for Development Server
+    \item Svelte and SvelteKit as Frontend Framework
+    \item Supabase for Backend Data Storage
+    \item Langchain.js and Langchain.py for Language Models
+    \item Python packages (NumPy, Pandas, Scikit-learn, etc.) for KB, and Deep Learning
+    \item FastAPI for Orchestration Server
+    \item Docker, Kubernetes for Deployment
+\end{itemize}
+
+\subsection*{Hardware}
+The hardware requirements for the deployment server include:
+\begin{itemize}
+    \item Intel Core i7 or AMD Ryzen 5000 processor
+    \item Nvidia RTX 4080 or better GPU
+    \item 64 GB DDR4 RAM
+    \item 4 TB SSD storage
+    \item 2.5 Gbps NIC
+\end{itemize}
+
+\section*{Theory Explanation}
+ARA is an innovative application leveraging advanced AI technologies to revolutionize the research process. It utilizes large language models, semantic web technologies, and knowledge graphs to create an interconnected web of research information that can be processed by AI models. ARA facilitates intelligent information retrieval, contextual synthesis, effective organization frameworks, and cross-disciplinary connection identification. By automating routine tasks, accelerating data analysis, and providing quick access to relevant information, ARA aims to enhance research productivity and drive innovation across various disciplines.
+
+\section*{Advantages}
+\begin{itemize}
+    \item Streamlines research workflows and enhances productivity
+    \item Unveils hidden insights and facilitates cross-disciplinary connections
+    \item Automates routine tasks and accelerates data analysis
+    \item Provides quick access to relevant information
+    \item Fosters collaboration and knowledge sharing
+    \item Continuously learns and adapts to evolving research needs
+\end{itemize}
+
+\section*{Disadvantages}
+\begin{itemize}
+    \item Requires significant computational resources for deployment
+    \item Potential for biased or inconsistent output from AI models
+    \item Limitations in logical reasoning and common-sense understanding
+    \item Ethical concerns related to the use of AI in research
+    \item Potential for over-reliance on AI, limiting human critical thinking
+\end{itemize}
+
+\section*{Our Own Observations}
+Throughout the development and testing of ARA, we made several interesting observations:
+
+\begin{itemize}
+    \item Integrating large language models into a user-friendly application proved challenging, as these models require significant computational resources and careful optimization to deliver real-time performance.
+    
+    \item Curating and cleaning training data for the AI models was a time-consuming process, as the quality and diversity of the training data heavily influenced the model's ability to generalize and provide accurate results.
+    
+    \item Striking the right balance between providing enough context and avoiding information overload was a delicate task when presenting research insights and connections to users. Initial models had a context window of 4096 tokens. It was later extended to 32768 tokens using a sliding window attention mechanism.
+    
+    \item Ensuring the reliability and transparency of AI-generated outputs was crucial, as users needed to understand the sources and potential biases or limitations of the information presented. A mechanism of citations was created, which allowed the LLM to link tokens generated to the source documents.
+    
+    \item Incorporating user feedback and adapting the AI models to evolving research needs required continuous monitoring and iterative improvements, making the development process dynamic and ongoing.
+    
+    \item The interdisciplinary nature of ARA necessitated collaboration among researchers from various domains, fostering a cross-pollination of ideas and approaches that enriched the project's outcomes.
+\end{itemize}
+
+
+\section*{Results and Conclusions}
+The development and deployment of ARA have yielded promising results, demonstrating significant improvements in information retrieval, synthesis, and organization. Researchers have reported substantial productivity gains, enabling them to focus on higher-level cognitive tasks and driving innovation. ARA's ability to continuously learn and adapt has further solidified its potential for long-term impact in the rapidly evolving research landscape.
+
+\end{document}
