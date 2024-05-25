@@ -7,12 +7,12 @@
     import { infoToast, normalToast, successToast } from '$lib/toast';
     export let data;
 
-    import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
+    // import { injectSpeedInsights } from '@vercel/speed-insights/sveltekit';
     import { inject } from '@vercel/analytics'
     import { dev } from '$app/environment';
 
     inject({ mode: dev ? 'development' : 'production' });
-    injectSpeedInsights();
+    // injectSpeedInsights();
 
     $: ({ supabase } = data);
 
