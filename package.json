@@ -63,7 +63,7 @@
         "carta-plugin-subscript": "^1.0.0",
         "highlight.js": "^11.9.0",
         "isomorphic-dompurify": "^2.4.0",
-        "katex": "^0.16.9",
+        "katex": "^0.16.21",
         "rehype-highlight": "^7.0.0",
         "rehype-mathjax": "^6.0.0",
         "remark-math": "^6.0.0",
